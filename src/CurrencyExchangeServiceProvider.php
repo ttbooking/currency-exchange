@@ -33,20 +33,22 @@ class CurrencyExchangeServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(ExchangeRateProvider::class, function () {
-            return new Chain([
-                new NationalBankOfRepublicBelarus,
-                new RussianCentralBank,
-            ]);
-        });
-
-        $this->app->extend(ExchangeRateProvider::class, function (ExchangeRateProvider $provider, $app) {
+        $this->app->singleton(ExchangeRateProvider::class, function ($app) {
             return new Identity(
-                new ReversibleExchangeRateProvider(
-                    new ExchangeRateCachingDecorator(
-                        $provider, new ExchangeRatePDOStore($app['db']->getPdo(), 'exchange_rates')
-                    )
-                )
+                new Chain([
+                    new ReversibleExchangeRateProvider(
+                        new ExchangeRateCachingDecorator(
+                            new NationalBankOfRepublicBelarus,
+                            new ExchangeRatePDOStore($app['db']->getPdo(), 'exchange_rates')
+                        )
+                    ),
+                    new ReversibleExchangeRateProvider(
+                        new ExchangeRateCachingDecorator(
+                            new RussianCentralBank,
+                            new ExchangeRatePDOStore($app['db']->getPdo(), 'exchange_rates')
+                        )
+                    ),
+                ])
             );
         });
     }
