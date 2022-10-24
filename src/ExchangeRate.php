@@ -13,7 +13,7 @@ final class ExchangeRate implements ExchangeRateContract
         private readonly CurrencyPair $currencyPair,
         private readonly float $value,
         private readonly \DateTimeInterface $date,
-        private readonly string $serviceName,
+        private readonly ?string $serviceName = null,
     ) {
     }
 
@@ -32,7 +32,7 @@ final class ExchangeRate implements ExchangeRateContract
         return $this->date;
     }
 
-    public function getServiceName(): string
+    public function getServiceName(): ?string
     {
         return $this->serviceName;
     }

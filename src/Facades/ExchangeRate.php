@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace TTBooking\CurrencyExchange\Facades;
+
 use Illuminate\Support\Facades\Facade;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate as ExchangeRateContract;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;

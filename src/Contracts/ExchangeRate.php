@@ -12,7 +12,7 @@ interface ExchangeRate extends \Stringable
 
     public function getCurrencyPair(): CurrencyPair;
 
-    public function getServiceName(): string;
+    public function getServiceName(): ?string;
 
     public function swapCurrencyPair(): self;
 
