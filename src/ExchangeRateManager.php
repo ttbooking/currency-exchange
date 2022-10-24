@@ -30,13 +30,13 @@ class ExchangeRateManager extends Manager implements ExchangeRateProvider
             new Chain([
                 new ReversibleExchangeRateProvider(
                     new ExchangeRateCachingDecorator(
-                        new NationalBankOfRepublicBelarus(),
+                        new NationalBankOfRepublicBelarus,
                         new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
                     )
                 ),
                 new ReversibleExchangeRateProvider(
                     new ExchangeRateCachingDecorator(
-                        new RussianCentralBank(),
+                        new RussianCentralBank,
                         new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
                     )
                 ),

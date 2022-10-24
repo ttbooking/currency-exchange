@@ -46,4 +46,14 @@ final class ExchangeRate implements ExchangeRateContract
     {
         return sprintf('%s %.4f', $this->currencyPair, $this->value);
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'currency_pair' => $this->currencyPair,
+            'date' => $this->date->format('Y-m-d'),
+            'service' => $this->serviceName,
+            'rate' => $this->value,
+        ];
+    }
 }

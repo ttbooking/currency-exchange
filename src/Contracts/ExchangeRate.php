@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange\Contracts;
 
-interface ExchangeRate extends \Stringable
+interface ExchangeRate extends \Stringable, \JsonSerializable
 {
     public function getValue(): float;
 
@@ -15,6 +15,4 @@ interface ExchangeRate extends \Stringable
     public function getServiceName(): ?string;
 
     public function swapCurrencyPair(): self;
-
-    public function __toString(): string;
 }

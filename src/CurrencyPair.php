@@ -38,4 +38,12 @@ final class CurrencyPair implements CurrencyPairContract
     {
         return $this->baseCurrency.'/'.$this->quoteCurrency;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'base' => $this->baseCurrency,
+            'quote' => $this->quoteCurrency,
+        ];
+    }
 }
