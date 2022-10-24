@@ -20,13 +20,16 @@ class ExchangeRatePDOStore implements ExchangeRateStore
 
     public function has(ExchangeRateQuery $query): bool
     {
-        $stat = $this->pdo->prepare($this->getQuery(true));
+        $service = $query->getOption('service');
 
-        $stat->execute([
+        $stat = $this->pdo->prepare($this->getQuery(isset($service), true));
+
+        $stat->execute(array_filter([
             $query->getCurrencyPair()->getBaseCurrency(),
             $query->getCurrencyPair()->getQuoteCurrency(),
-            ($query->getDate() ?? new \DateTime)->format('Y-m-d'),
-        ]);
+            $query->getDate()->format('Y-m-d'),
+            $service,
+        ]));
 
         $result = $stat->fetch();
 
@@ -35,13 +38,16 @@ class ExchangeRatePDOStore implements ExchangeRateStore
 
     public function get(ExchangeRateQuery $query): ExchangeRate
     {
-        $stat = $this->pdo->prepare($this->getQuery());
+        $service = $query->getOption('service');
 
-        $stat->execute([
+        $stat = $this->pdo->prepare($this->getQuery(isset($service)));
+
+        $stat->execute(array_filter([
             $query->getCurrencyPair()->getBaseCurrency(),
             $query->getCurrencyPair()->getQuoteCurrency(),
-            ($query->getDate() ?? new \DateTime)->format('Y-m-d'),
-        ]);
+            $query->getDate()->format('Y-m-d'),
+            $service,
+        ]));
 
         $result = $stat->fetch();
 
@@ -49,7 +55,7 @@ class ExchangeRatePDOStore implements ExchangeRateStore
             throw new UnsupportedExchangeQueryException;
         }
 
-        return new ExchangeRate($query->getCurrencyPair(), (float) $value, $query->getDate());
+        return new ExchangeRate($query->getCurrencyPair(), (float) $value, $query->getDate(), $result[1] ?? null);
     }
 
     public function store(ExchangeRateContract $exchangeRate): ExchangeRate
@@ -57,13 +63,13 @@ class ExchangeRatePDOStore implements ExchangeRateStore
         $stat = $this->pdo->prepare("insert into {$this->table} (base, quote, date, service, rate) values (?, ?, ?, ?, ?)");
 
         //try {
-        $stat->execute([
-            $exchangeRate->getCurrencyPair()->getBaseCurrency(),
-            $exchangeRate->getCurrencyPair()->getQuoteCurrency(),
-            $exchangeRate->getDate()->format('Y-m-d'),
-            $exchangeRate->getServiceName(),
-            $exchangeRate->getValue(),
-        ]);
+            $stat->execute([
+                $exchangeRate->getCurrencyPair()->getBaseCurrency(),
+                $exchangeRate->getCurrencyPair()->getQuoteCurrency(),
+                $exchangeRate->getDate()->format('Y-m-d'),
+                $exchangeRate->getServiceName(),
+                $exchangeRate->getValue(),
+            ]);
         //} catch (PDOException $e) {
         //    throw new ExchangeRateStoreException(previous: $e);
         //}
@@ -71,9 +77,10 @@ class ExchangeRatePDOStore implements ExchangeRateStore
         return $exchangeRate;
     }
 
-    private function getQuery(bool $existsQuery = false): string
+    private function getQuery(bool $serviceSpecified, bool $existsQuery = false): string
     {
-        $query = "select rate from {$this->table} where base = ? and quote = ? and date = ? order by created_at limit 1";
+        $serviceQuery = $serviceSpecified ? ' and service = ?' : '';
+        $query = "select rate, service from {$this->table} where base = ? and quote = ? and date = ?{$serviceQuery} order by created_at limit 1";
 
         if ($existsQuery) {
             $query = "select exists ($query) as `exists`";
