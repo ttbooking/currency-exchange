@@ -18,7 +18,7 @@ class NationalBankOfRepublicBelarus extends HttpService
         $currencyPair = $query->getCurrencyPair();
         $baseCurrency = $currencyPair->getBaseCurrency();
         $quoteCurrency = $currencyPair->getQuoteCurrency();
-        $date = $query->getDate() !== null && !$ignoreSupportPeriod ? $query->getDate() : null;
+        $date = $query->isHistorical() && !$ignoreSupportPeriod ? $query->getDate() : null;
 
         return is_int(self::detectPeriodicity($baseCurrency, $date))
             && self::supportQuoteCurrency($quoteCurrency, $date);
@@ -102,12 +102,11 @@ class NationalBankOfRepublicBelarus extends HttpService
      * Creates the rate.
      *
      * @param ExchangeRateQuery $query
-     * @param \DateTimeInterface|null $requestedDate
      * @return ExchangeRate
      *
      * @throws UnsupportedExchangeQueryException
      */
-    public function get(ExchangeRateQuery $query, \DateTimeInterface $requestedDate = null): ExchangeRate
+    public function get(ExchangeRateQuery $query): ExchangeRate
     {
         $currencyPair = $query->getCurrencyPair();
         $baseCurrency = $currencyPair->getBaseCurrency();
@@ -116,11 +115,11 @@ class NationalBankOfRepublicBelarus extends HttpService
             throw new UnsupportedExchangeQueryException;
         }
 
-        if ($requestedDate && $requestedDate->format('Y-m-d') < '1995-03-29') {
+        if ($query->isHistorical() && $query->getDate()->format('Y-m-d') < '1995-03-29') {
             throw new UnsupportedExchangeQueryException;
         }
 
-        $content = $this->request($this->buildUrl($baseCurrency, $requestedDate));
+        $content = $this->request($this->buildUrl($baseCurrency, $query->isHistorical() ? $query->getDate() : null));
         $result = StringUtil::jsonToArray($content);
         $entryId = array_search($baseCurrency, array_column($result, 'Cur_Abbreviation'));
 
@@ -145,8 +144,7 @@ class NationalBankOfRepublicBelarus extends HttpService
         }
 
         $date = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $entry['Date'] ?? null);
-        $requestedDate = $requestedDate ?? new \DateTimeImmutable;
-        if (!$date || $date->format('Y-m-d') !== $requestedDate->format('Y-m-d')) {
+        if (!$date || $date->format('Y-m-d') !== $query->getDate()->format('Y-m-d')) {
             throw new UnsupportedExchangeQueryException;
         }
 

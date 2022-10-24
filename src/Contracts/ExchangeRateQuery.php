@@ -8,9 +8,11 @@ interface ExchangeRateQuery
 {
     public function getCurrencyPair(): CurrencyPair;
 
-    public function getDate(): ?\DateTimeInterface;
+    public function getDate(): \DateTimeInterface;
 
     public function getOption(string $name, mixed $default = null): mixed;
+
+    public function isHistorical(): bool;
 
     public function swapCurrencyPair(): self;
 }

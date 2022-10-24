@@ -10,9 +10,9 @@ use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery as ExchangeRateQueryC
 final class ExchangeRateQuery implements ExchangeRateQueryContract
 {
     public function __construct(
-        private CurrencyPair $currencyPair,
-        private ?\DateTimeInterface $date = null,
-        private array $options = [],
+        private readonly CurrencyPair $currencyPair,
+        private readonly ?\DateTimeInterface $date = null,
+        private readonly array $options = [],
     ) {
     }
 
@@ -21,14 +21,19 @@ final class ExchangeRateQuery implements ExchangeRateQueryContract
         return $this->currencyPair;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): \DateTimeInterface
     {
-        return $this->date;
+        return $this->date ?? new \DateTimeImmutable;
     }
 
     public function getOption(string $name, mixed $default = null): mixed
     {
         return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
+    }
+
+    public function isHistorical(): bool
+    {
+        return isset($this->date);
     }
 
     public function swapCurrencyPair(): self

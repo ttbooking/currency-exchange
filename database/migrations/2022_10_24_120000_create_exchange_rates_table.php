@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('service');
             $table->unsignedDecimal('rate', 14, 8);
             $table->primary(['base', 'quote', 'date', 'service']);
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 

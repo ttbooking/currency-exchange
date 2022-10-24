@@ -17,16 +17,18 @@ class RussianCentralBank extends HttpService
     {
         $currencyPair = $query->getCurrencyPair();
         $baseCurrency = $currencyPair->getBaseCurrency();
-        $date = $query->getDate();
-        $formattedDate = $date?->format('d.m.Y');
+        $formattedDate = $query->getDate()->format('d.m.Y');
 
-        $content = $this->request($date ? static::URL.'?'.http_build_query(['date_req' => $formattedDate]) : static::URL);
+        $content = $this->request($query->isHistorical()
+            ? static::URL.'?'.http_build_query(['date_req' => $formattedDate])
+            : static::URL
+        );
         $element = StringUtil::xmlToElement($content);
 
         $elements = $element->xpath('./Valute[CharCode="'.$baseCurrency.'"]');
         $responseDate = \DateTimeImmutable::createFromFormat('!d.m.Y', (string) $element['Date']);
 
-        if (empty($elements) || $date && $formattedDate !== (string) $element['Date']) {
+        if (empty($elements) || $formattedDate !== (string) $element['Date']) {
             throw new UnsupportedExchangeQueryException;
         }
 
