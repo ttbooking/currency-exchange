@@ -12,6 +12,7 @@ use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 use TTBooking\CurrencyExchange\Providers\Chain;
 use TTBooking\CurrencyExchange\Providers\ExchangeRateCachingDecorator;
 use TTBooking\CurrencyExchange\Providers\ExchangeRatePDOStore;
+use TTBooking\CurrencyExchange\Providers\GatewayProxy;
 use TTBooking\CurrencyExchange\Providers\Identity;
 use TTBooking\CurrencyExchange\Providers\NationalBankOfRepublicBelarus;
 use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateProvider;
@@ -41,6 +42,22 @@ class ExchangeRateManager extends Manager implements ExchangeRateProvider
                     )
                 ),
             ])
+        );
+    }
+
+    /**
+     * Create an instance of the Currency Exchange Gateway Proxy service.
+     *
+     * @return ExchangeRateProvider
+     */
+    public function createGatewayProxyDriver(): ExchangeRateProvider
+    {
+        return new Identity(
+            new ReversibleExchangeRateProvider(
+                new ExchangeRateCachingDecorator(
+                    new GatewayProxy,
+                )
+            )
         );
     }
 

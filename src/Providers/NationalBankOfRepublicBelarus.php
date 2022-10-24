@@ -172,6 +172,6 @@ class NationalBankOfRepublicBelarus extends HttpService
         $data = isset($requestedDate) ? ['ondate' => $requestedDate->format('Y-m-d')] : [];
         $data += ['periodicity' => (int) self::detectPeriodicity($baseCurrency, $requestedDate)];
 
-        return self::URL.'?'.http_build_query($data);
+        return static::URL.'?'.http_build_query($data);
     }
 }
