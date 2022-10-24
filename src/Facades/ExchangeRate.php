@@ -10,6 +10,7 @@ use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 
 /**
+ * @method static ExchangeRateProvider provider(string $provider = null)
  * @method static bool has(ExchangeRateQuery $query)
  * @method static ExchangeRateContract get(ExchangeRateQuery $query)
  *
@@ -24,6 +25,6 @@ class ExchangeRate extends Facade
      */
     protected static function getFacadeAccessor(): string
     {
-        return ExchangeRateProvider::class;
+        return 'currency-exchange';
     }
 }

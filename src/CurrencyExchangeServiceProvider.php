@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange;
 
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
-use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
-use TTBooking\CurrencyExchange\Providers\Chain;
-use TTBooking\CurrencyExchange\Providers\ExchangeRateCachingDecorator;
-use TTBooking\CurrencyExchange\Providers\ExchangeRatePDOStore;
-use TTBooking\CurrencyExchange\Providers\Identity;
-use TTBooking\CurrencyExchange\Providers\NationalBankOfRepublicBelarus;
-use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateProvider;
-use TTBooking\CurrencyExchange\Providers\RussianCentralBank;
+//use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
+//use TTBooking\CurrencyExchange\Providers\Chain;
+//use TTBooking\CurrencyExchange\Providers\ExchangeRateCachingDecorator;
+//use TTBooking\CurrencyExchange\Providers\ExchangeRatePDOStore;
+//use TTBooking\CurrencyExchange\Providers\Identity;
+//use TTBooking\CurrencyExchange\Providers\NationalBankOfRepublicBelarus;
+//use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateProvider;
+//use TTBooking\CurrencyExchange\Providers\RussianCentralBank;
 
-class CurrencyExchangeServiceProvider extends ServiceProvider
+class CurrencyExchangeServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Bootstrap any application services.
@@ -23,7 +24,26 @@ class CurrencyExchangeServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // TODO
+        if ($this->app->runningInConsole()) {
+            $this->offerPublishing();
+            $this->registerMigrations();
+        }
+    }
+
+    protected function offerPublishing(): void
+    {
+        $this->publishes([
+            __DIR__.'/../config/currency-exchange.php' => $this->app->configPath('currency-exchange.php'),
+        ], 'currency-exchange-config');
+
+        $this->publishes([
+            __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
+        ], 'currency-exchange-migrations');
+    }
+
+    protected function registerMigrations(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 
     /**
@@ -33,7 +53,17 @@ class CurrencyExchangeServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(ExchangeRateProvider::class, function ($app) {
+        $this->mergeConfigFrom(__DIR__.'/../config/currency-exchange.php', 'currency-exchange');
+
+        $this->app->singleton('currency-exchange', function ($app) {
+            return new ExchangeRateManager($app);
+        });
+
+        $this->app->singleton('currency-exchange.provider', function ($app) {
+            return $app['currency-exchange']->driver();
+        });
+
+        /*$this->app->singleton(ExchangeRateProvider::class, function ($app) {
             return new Identity(
                 new Chain([
                     new ReversibleExchangeRateProvider(
@@ -50,6 +80,16 @@ class CurrencyExchangeServiceProvider extends ServiceProvider
                     ),
                 ])
             );
-        });
+        });*/
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides(): array
+    {
+        return ['currency-exchange', 'currency-exchange.provider'];
     }
 }
