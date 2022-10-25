@@ -7,6 +7,7 @@ namespace TTBooking\CurrencyExchange\Providers;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
+use TTBooking\CurrencyExchange\ExchangeRate;
 
 class ExchangeRateNullProvider implements ExchangeRateProvider
 {
@@ -15,7 +16,7 @@ class ExchangeRateNullProvider implements ExchangeRateProvider
         return false;
     }
 
-    public function get(ExchangeRateQuery $query): never
+    public function get(ExchangeRateQuery $query): ExchangeRate
     {
         throw new UnsupportedExchangeQueryException;
     }

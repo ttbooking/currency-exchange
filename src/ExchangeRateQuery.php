@@ -10,9 +10,9 @@ use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery as ExchangeRateQueryC
 final class ExchangeRateQuery implements ExchangeRateQueryContract
 {
     public function __construct(
-        private readonly CurrencyPair $currencyPair,
-        private readonly ?\DateTimeInterface $date = null,
-        private readonly array $options = [],
+        private CurrencyPair $currencyPair,
+        private ?\DateTimeInterface $date = null,
+        private array $options = [],
     ) {
     }
 

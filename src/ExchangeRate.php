@@ -10,10 +10,10 @@ use TTBooking\CurrencyExchange\Contracts\ExchangeRate as ExchangeRateContract;
 final class ExchangeRate implements ExchangeRateContract
 {
     public function __construct(
-        private readonly CurrencyPairContract $currencyPair,
-        private readonly float $value,
-        private readonly \DateTimeInterface $date,
-        private readonly ?string $serviceName = null,
+        private CurrencyPairContract $currencyPair,
+        private float $value,
+        private \DateTimeInterface $date,
+        private ?string $serviceName = null,
     ) {
     }
 

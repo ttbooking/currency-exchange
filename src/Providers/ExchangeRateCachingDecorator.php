@@ -13,8 +13,9 @@ class ExchangeRateCachingDecorator implements ExchangeRateProvider
 {
     public function __construct(
         protected ExchangeRateProvider $provider,
-        protected ExchangeRateStore $store = new ExchangeRateNullStore,
+        protected ?ExchangeRateStore $store = null,
     ) {
+        $this->store ??= new ExchangeRateNullStore;
     }
 
     public function has(ExchangeRateQuery $query): bool

@@ -10,8 +10,9 @@ use TTBooking\CurrencyExchange\ExchangeRate;
 
 class Identity implements ExchangeRateProvider
 {
-    public function __construct(protected ExchangeRateProvider $provider = new ExchangeRateNullProvider)
+    public function __construct(protected ?ExchangeRateProvider $provider = null)
     {
+        $this->provider ??= new ExchangeRateNullProvider;
     }
 
     public function has(ExchangeRateQuery $query): bool

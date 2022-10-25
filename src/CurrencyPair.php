@@ -9,8 +9,8 @@ use TTBooking\CurrencyExchange\Contracts\CurrencyPair as CurrencyPairContract;
 final class CurrencyPair implements CurrencyPairContract
 {
     public function __construct(
-        private readonly string $baseCurrency,
-        private readonly string $quoteCurrency,
+        private string $baseCurrency,
+        private string $quoteCurrency,
     ) {
     }
 
