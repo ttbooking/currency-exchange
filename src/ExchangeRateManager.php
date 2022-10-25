@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange;
 
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Manager;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
-use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
+use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery as ExchangeRateQueryContract;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 use TTBooking\CurrencyExchange\Providers\Chain;
 use TTBooking\CurrencyExchange\Providers\ExchangeRateCachingDecorator;
@@ -94,23 +95,27 @@ class ExchangeRateManager extends Manager implements ExchangeRateProvider
     }
 
     /**
-     * @param ExchangeRateQuery $query
+     * @param  ExchangeRateQueryContract|string  $query
+     * @param  mixed  $date
+     * @param  array  $options
      * @return bool
      */
-    public function has(ExchangeRateQuery $query): bool
+    public function has(ExchangeRateQueryContract|string $query, mixed $date = null, array $options = []): bool
     {
-        return $this->driver()->has($query);
+        return $this->driver()->has(static::quote($query, $date, $options));
     }
 
     /**
-     * @param ExchangeRateQuery $query
+     * @param  ExchangeRateQueryContract|string  $query
+     * @param  mixed  $date
+     * @param  array  $options
      * @return ExchangeRate
      *
      * @throws UnsupportedExchangeQueryException
      */
-    public function get(ExchangeRateQuery $query): ExchangeRate
+    public function get(ExchangeRateQueryContract|string $query, mixed $date = null, array $options = []): ExchangeRate
     {
-        return $this->driver()->get($query);
+        return $this->driver()->get(static::quote($query, $date, $options));
     }
 
     /**
@@ -134,5 +139,14 @@ class ExchangeRateManager extends Manager implements ExchangeRateProvider
     public function provider(string $provider = null): ExchangeRateProvider
     {
         return $this->driver($provider);
+    }
+
+    protected static function quote(ExchangeRateQueryContract|string $query, mixed $date = null, array $options = []): ExchangeRateQueryContract
+    {
+        if ($query instanceof ExchangeRateQueryContract) {
+            return $query;
+        }
+
+        return new ExchangeRateQuery(CurrencyPair::fromString($query), Date::make($date), $options);
     }
 }

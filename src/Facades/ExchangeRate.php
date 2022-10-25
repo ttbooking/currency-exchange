@@ -11,8 +11,8 @@ use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 
 /**
  * @method static ExchangeRateProvider provider(string $provider = null)
- * @method static bool has(ExchangeRateQuery $query)
- * @method static ExchangeRateContract get(ExchangeRateQuery $query)
+ * @method static bool has(ExchangeRateQuery|string $query, mixed $date = null, array $options = [])
+ * @method static ExchangeRateContract get(ExchangeRateQuery|string $query, mixed $date = null, array $options = [])
  *
  * @see \TTBooking\CurrencyExchange\Providers\Chain
  */
