@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange\Providers;
 
-use TTBooking\CurrencyExchange\Contracts\ExchangeRate;
+use TTBooking\CurrencyExchange\ExchangeRate;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\StringUtil;
 
 class GatewayProxy extends HttpService
 {
-    protected const URL = 'http://cxgw/api/rate';
+    protected const URL = 'http://cxgw/api/currency-exchange/rate';
 
     public function has(ExchangeRateQuery $query): bool
     {
@@ -21,6 +21,8 @@ class GatewayProxy extends HttpService
     {
         $content = $this->request($this->buildUrl($query));
         $result = StringUtil::jsonToArray($content);
+
+        return ExchangeRate::fromArray($result);
     }
 
     public function getName(): string

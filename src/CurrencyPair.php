@@ -46,4 +46,9 @@ final class CurrencyPair implements CurrencyPairContract
             'quote' => $this->quoteCurrency,
         ];
     }
+
+    public static function fromArray(array $currencyPair): self
+    {
+        return new self($currencyPair['base'], $currencyPair['quote']);
+    }
 }

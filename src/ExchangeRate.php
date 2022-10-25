@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange;
 
-use TTBooking\CurrencyExchange\Contracts\CurrencyPair;
+use TTBooking\CurrencyExchange\Contracts\CurrencyPair as CurrencyPairContract;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate as ExchangeRateContract;
 
 final class ExchangeRate implements ExchangeRateContract
 {
     public function __construct(
-        private readonly CurrencyPair $currencyPair,
+        private readonly CurrencyPairContract $currencyPair,
         private readonly float $value,
         private readonly \DateTimeInterface $date,
         private readonly ?string $serviceName = null,
     ) {
     }
 
-    public function getCurrencyPair(): CurrencyPair
+    public function getCurrencyPair(): CurrencyPairContract
     {
         return $this->currencyPair;
     }
@@ -55,5 +55,15 @@ final class ExchangeRate implements ExchangeRateContract
             'service' => $this->serviceName,
             'rate' => $this->value,
         ];
+    }
+
+    public static function fromArray(array $exchangeRate): self
+    {
+        return new self(
+            CurrencyPair::fromArray($exchangeRate['currency_pair']),
+            $exchangeRate['rate'],
+            new \DateTimeImmutable($exchangeRate['date']),
+            $exchangeRate['service']
+        );
     }
 }
