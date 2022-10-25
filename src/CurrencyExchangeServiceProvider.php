@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace TTBooking\CurrencyExchange;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use TTBooking\CurrencyExchange\Http\Controllers\ExchangeRateController;
+
 //use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
 //use TTBooking\CurrencyExchange\Providers\Chain;
 //use TTBooking\CurrencyExchange\Providers\ExchangeRateCachingDecorator;
@@ -24,10 +27,26 @@ class CurrencyExchangeServiceProvider extends ServiceProvider implements Deferra
      */
     public function boot(): void
     {
+        $this->registerRoutes();
+
         if ($this->app->runningInConsole()) {
             $this->offerPublishing();
             $this->registerMigrations();
         }
+    }
+
+    protected function registerRoutes(): void
+    {
+        Route::group([
+            'domain' => $this->app['config']['currency-exchange.domain'] ?? null,
+            'prefix' => $this->app['config']['currency-exchange.path'] ?? null,
+            'name' => 'currency-exchange.',
+            'namespace' => 'TTBooking\\CurrencyExchange\\Http\\Controllers',
+            'middleware' => $this->app['config']['currency-exchange.middleware'] ?? 'api',
+        ], function () {
+            Route::get('/rate/{base}/{quote}', [ExchangeRateController::class, 'getExchangeRate'])
+                ->where(['base' => '[A-Z]{3}', 'quote' => '[A-Z]{3}']);
+        });
     }
 
     protected function offerPublishing(): void
