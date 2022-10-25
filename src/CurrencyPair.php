@@ -47,6 +47,17 @@ final class CurrencyPair implements CurrencyPairContract
         ];
     }
 
+    public static function fromString(string $currencyPair): self
+    {
+        if (!preg_match('#^[A-Z]{3}/[A-Z]{3}$#', $currencyPair)) {
+            throw new \InvalidArgumentException('The currency pair must be in the form "EUR/USD".');
+        }
+
+        $parts = explode('/', $currencyPair);
+
+        return new self($parts[0], $parts[1]);
+    }
+
     public static function fromArray(array $currencyPair): self
     {
         return new self($currencyPair['base'], $currencyPair['quote']);
