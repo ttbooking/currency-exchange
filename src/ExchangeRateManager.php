@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TTBooking\CurrencyExchange;
 
 use Illuminate\Support\Manager;
-use TTBooking\CurrencyExchange\Concerns\QuotesQueries;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider as ExchangeRateProviderContract;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery as ExchangeRateQueryContract;
@@ -21,8 +20,6 @@ use TTBooking\CurrencyExchange\Providers\RussianCentralBank;
 
 class ExchangeRateManager extends Manager implements ExchangeRateProviderContract
 {
-    use QuotesQueries;
-
     /**
      * Create an instance of the Chain exchange rate provider.
      *
@@ -112,7 +109,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      */
     public function has(ExchangeRateQueryContract|string $query, mixed $date = null, array $options = []): bool
     {
-        return $this->driver()->has(static::quote($query, $date, $options));
+        return $this->provider()->has($query, $date, $options);
     }
 
     /**
@@ -125,7 +122,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      */
     public function get(ExchangeRateQueryContract|string $query, mixed $date = null, array $options = []): ExchangeRate
     {
-        return $this->driver()->get(static::quote($query, $date, $options));
+        return $this->provider()->get($query, $date, $options);
     }
 
     /**
