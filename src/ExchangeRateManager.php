@@ -56,7 +56,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProvider
         return new Identity(
             new ReversibleExchangeRateProvider(
                 new ExchangeRateCachingDecorator(
-                    new GatewayProxy,
+                    new GatewayProxy(config: $this->config->get('currency-exchange.providers.gateway_proxy', [])),
                 )
             )
         );

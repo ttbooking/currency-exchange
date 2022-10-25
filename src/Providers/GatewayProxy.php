@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange\Providers;
 
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 use TTBooking\CurrencyExchange\ExchangeRate;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\StringUtil;
 
 class GatewayProxy extends HttpService
 {
-    protected const URL = 'http://cxgw/api/currency-exchange/rate';
+    public function __construct(
+        ?ClientInterface $httpClient = null,
+        ?RequestFactoryInterface $requestFactory = null,
+        protected array $config = [],
+    ) {
+        parent::__construct($httpClient, $requestFactory);
+    }
 
     public function has(ExchangeRateQuery $query): bool
     {
@@ -34,13 +42,13 @@ class GatewayProxy extends HttpService
     {
         return $query->isHistorical()
 
-            ? sprintf('%s/%s/%s?date=%s', static::URL,
+            ? sprintf('%s/%s/%s?date=%s', $this->config['url'],
                 $query->getCurrencyPair()->getBaseCurrency(),
                 $query->getCurrencyPair()->getQuoteCurrency(),
                 $query->getDate()->format('Y-m-d'),
             )
 
-            : sprintf('%s/%s/%s', static::URL,
+            : sprintf('%s/%s/%s', $this->config['url'],
                 $query->getCurrencyPair()->getBaseCurrency(),
                 $query->getCurrencyPair()->getQuoteCurrency(),
             );
