@@ -6,8 +6,8 @@ namespace TTBooking\CurrencyExchange\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate as ExchangeRateContract;
-use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
+use TTBooking\CurrencyExchange\ExchangeRateProvider;
 
 /**
  * @method static ExchangeRateProvider provider(string $provider = null)
