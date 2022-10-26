@@ -15,6 +15,10 @@ class RussianCentralBank extends HttpService
 
     public function get(ExchangeRateQuery $query): ExchangeRate
     {
+        if (!$this->has($query)) {
+            throw new UnsupportedExchangeQueryException;
+        }
+
         $currencyPair = $query->getCurrencyPair();
         $baseCurrency = $currencyPair->getBaseCurrency();
         $formattedDate = $query->getDate()->format('d.m.Y');
