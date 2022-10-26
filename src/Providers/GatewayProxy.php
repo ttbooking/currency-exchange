@@ -27,7 +27,7 @@ class GatewayProxy extends HttpService
 
     public function get(ExchangeRateQuery $query): ExchangeRate
     {
-        $content = $this->request($this->buildUrl($query));
+        $content = $this->request($this->buildUrl($query), ['Accept' => 'application/json']);
         $result = StringUtil::jsonToArray($content);
 
         return ExchangeRate::fromArray($result);
