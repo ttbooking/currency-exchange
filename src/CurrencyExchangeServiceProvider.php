@@ -18,7 +18,6 @@ class CurrencyExchangeServiceProvider extends ServiceProvider implements Deferra
     {
         if ($this->app->runningInConsole()) {
             $this->offerPublishing();
-            $this->registerMigrations();
         }
     }
 
@@ -31,11 +30,6 @@ class CurrencyExchangeServiceProvider extends ServiceProvider implements Deferra
         $this->publishes([
             __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
         ], 'currency-exchange-migrations');
-    }
-
-    protected function registerMigrations(): void
-    {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 
     /**

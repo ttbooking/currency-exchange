@@ -16,6 +16,7 @@ use TTBooking\CurrencyExchange\Providers\GatewayProxy;
 use TTBooking\CurrencyExchange\Providers\Identity;
 use TTBooking\CurrencyExchange\Providers\NationalBankOfRepublicBelarus;
 use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateProvider;
+use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateStore;
 use TTBooking\CurrencyExchange\Providers\RussianCentralBank;
 
 class ExchangeRateManager extends Manager implements ExchangeRateProviderContract
@@ -33,13 +34,17 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
                     new ReversibleExchangeRateProvider(
                         new ExchangeRateCachingDecorator(
                             new NationalBankOfRepublicBelarus,
-                            new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
+                            new ReversibleExchangeRateStore(
+                                new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
+                            )
                         )
                     ),
                     new ReversibleExchangeRateProvider(
                         new ExchangeRateCachingDecorator(
                             new RussianCentralBank,
-                            new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
+                            new ReversibleExchangeRateStore(
+                                new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
+                            )
                         )
                     ),
                 ])
