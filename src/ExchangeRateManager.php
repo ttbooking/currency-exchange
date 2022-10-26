@@ -14,6 +14,7 @@ use TTBooking\CurrencyExchange\Providers\ExchangeRateCachingDecorator;
 use TTBooking\CurrencyExchange\Providers\ExchangeRatePDOStore;
 use TTBooking\CurrencyExchange\Providers\GatewayProxy;
 use TTBooking\CurrencyExchange\Providers\Identity;
+use TTBooking\CurrencyExchange\Providers\Indirect;
 use TTBooking\CurrencyExchange\Providers\NationalBankOfRepublicBelarus;
 use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateProvider;
 use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateStore;
@@ -79,10 +80,13 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         return new ExchangeRateProvider(
             new Identity(
-                new ReversibleExchangeRateProvider(
-                    new ExchangeRateCachingDecorator(
-                        new RussianCentralBank,
-                    )
+                new Indirect(
+                    new ReversibleExchangeRateProvider(
+                        new ExchangeRateCachingDecorator(
+                            new RussianCentralBank,
+                        )
+                    ),
+                    'RUB'
                 )
             )
         );
@@ -97,10 +101,13 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         return new ExchangeRateProvider(
             new Identity(
-                new ReversibleExchangeRateProvider(
-                    new ExchangeRateCachingDecorator(
-                        new NationalBankOfRepublicBelarus,
-                    )
+                new Indirect(
+                    new ReversibleExchangeRateProvider(
+                        new ExchangeRateCachingDecorator(
+                            new NationalBankOfRepublicBelarus,
+                        )
+                    ),
+                    'BYN'
                 )
             )
         );
