@@ -22,7 +22,12 @@ class GatewayProxy extends HttpService
 
     public function has(ExchangeRateQuery $query): bool
     {
-        // TODO: Implement has() method.
+        try {
+            $this->get($query);
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     public function get(ExchangeRateQuery $query): ExchangeRate
