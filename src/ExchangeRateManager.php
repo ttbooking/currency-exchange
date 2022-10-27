@@ -10,6 +10,7 @@ use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider as ExchangeRatePro
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery as ExchangeRateQueryContract;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 use TTBooking\CurrencyExchange\Providers\Chain;
+use TTBooking\CurrencyExchange\Providers\ExchangeRateCacheStore;
 use TTBooking\CurrencyExchange\Providers\ExchangeRateCachingDecorator;
 use TTBooking\CurrencyExchange\Providers\ExchangeRatePDOStore;
 use TTBooking\CurrencyExchange\Providers\GatewayProxy;
@@ -66,6 +67,9 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
                 new ReversibleExchangeRateProvider(
                     new ExchangeRateCachingDecorator(
                         new GatewayProxy(config: $this->config->get('currency-exchange.providers.gateway_proxy', [])),
+                        new ReversibleExchangeRateStore(
+                            new ExchangeRateCacheStore($this->container['cache'])
+                        )
                     )
                 )
             )
@@ -85,7 +89,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
                     new Indirect(
                         new ReversibleExchangeRateProvider(
                             new ExchangeRateCachingDecorator(
-                                new RussianCentralBank,
+                                new RussianCentralBank
                             )
                         ),
                         'RUB'
@@ -108,7 +112,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
                     new Indirect(
                         new ReversibleExchangeRateProvider(
                             new ExchangeRateCachingDecorator(
-                                new NationalBankOfRepublicBelarus,
+                                new NationalBankOfRepublicBelarus
                             )
                         ),
                         'BYN'

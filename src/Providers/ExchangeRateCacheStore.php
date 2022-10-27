@@ -6,7 +6,6 @@ namespace TTBooking\CurrencyExchange\Providers;
 
 use Psr\SimpleCache\CacheInterface;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate;
-use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateStore;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
@@ -14,7 +13,6 @@ use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 class ExchangeRateCacheStore implements ExchangeRateStore
 {
     public function __construct(
-        protected ExchangeRateProvider $provider,
         protected CacheInterface $cache,
         protected array $options = [],
     ) {
@@ -46,7 +44,7 @@ class ExchangeRateCacheStore implements ExchangeRateStore
         $cacheKeyPrefix = $this->options['cache_key_prefix'] ?? '';
         $cacheKeyPrefix = preg_replace('#[{}()/\\\@:]#', '-', $cacheKeyPrefix);
 
-        $cacheKey = $cacheKeyPrefix.sha1(serialize($query->getCurrencyPair()).serialize($query->getDate()));
+        $cacheKey = $cacheKeyPrefix.sha1($query->getCurrencyPair().$query->getDate()->format('Y-m-d'));
         if (strlen($cacheKey) > 64) {
             throw new \Exception("Cache key length exceeds 64 characters ('$cacheKey'). This violates PSR-6 standard");
         }
