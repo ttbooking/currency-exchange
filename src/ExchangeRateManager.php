@@ -34,8 +34,8 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
         return new ExchangeRateProvider(
             new Identity(
                 new Round(
-                    new Chain([
-                        new Indirect(
+                    new Indirect(
+                        new Chain([
                             new ReversibleExchangeRateProvider(
                                 new ExchangeRateCachingDecorator(
                                     new NationalBankOfRepublicBelarus,
@@ -44,9 +44,6 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
                                     )
                                 )
                             ),
-                            'BYN'
-                        ),
-                        new Indirect(
                             new ReversibleExchangeRateProvider(
                                 new ExchangeRateCachingDecorator(
                                     new RussianCentralBank,
@@ -55,9 +52,9 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
                                     )
                                 )
                             ),
-                            'RUB'
-                        ),
-                    ])
+                        ]),
+                        'RUB'
+                    )
                 )
             )
         );
