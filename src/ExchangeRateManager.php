@@ -18,6 +18,7 @@ use TTBooking\CurrencyExchange\Providers\Indirect;
 use TTBooking\CurrencyExchange\Providers\NationalBankOfRepublicBelarus;
 use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateProvider;
 use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateStore;
+use TTBooking\CurrencyExchange\Providers\Round;
 use TTBooking\CurrencyExchange\Providers\RussianCentralBank;
 
 class ExchangeRateManager extends Manager implements ExchangeRateProviderContract
@@ -80,13 +81,15 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         return new ExchangeRateProvider(
             new Identity(
-                new Indirect(
-                    new ReversibleExchangeRateProvider(
-                        new ExchangeRateCachingDecorator(
-                            new RussianCentralBank,
-                        )
-                    ),
-                    'RUB'
+                new Round(
+                    new Indirect(
+                        new ReversibleExchangeRateProvider(
+                            new ExchangeRateCachingDecorator(
+                                new RussianCentralBank,
+                            )
+                        ),
+                        'RUB'
+                    )
                 )
             )
         );
@@ -101,13 +104,15 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         return new ExchangeRateProvider(
             new Identity(
-                new Indirect(
-                    new ReversibleExchangeRateProvider(
-                        new ExchangeRateCachingDecorator(
-                            new NationalBankOfRepublicBelarus,
-                        )
-                    ),
-                    'BYN'
+                new Round(
+                    new Indirect(
+                        new ReversibleExchangeRateProvider(
+                            new ExchangeRateCachingDecorator(
+                                new NationalBankOfRepublicBelarus,
+                            )
+                        ),
+                        'BYN'
+                    )
                 )
             )
         );
