@@ -31,6 +31,13 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      */
     public function createChainDriver(): ExchangeRateProvider
     {
+        /**
+         * identity | round:8 | indirect:RUB | chain | (
+         *     rev | back:(rev|pdo:exchange_rates) | nbrb,
+         *     rev | back:(rev|pdo:exchange_rates) | cbrf
+         * )
+         */
+
         return new ExchangeRateProvider(
             new Identity(
                 new Round(
@@ -67,6 +74,8 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      */
     public function createGatewayProxyDriver(): ExchangeRateProvider
     {
+        // identity | round:8 | indirect:RUB | rev | back:(rev|cache:exchange_rates,86400) | proxy:cxwb/api/rate
+
         return new ExchangeRateProvider(
             new Identity(
                 new Round(
@@ -96,6 +105,8 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      */
     public function createRussianCentralBankDriver(): ExchangeRateProvider
     {
+        // identity | round:8 | indirect:RUB | rev | back | cbrf
+
         return new ExchangeRateProvider(
             new Identity(
                 new Round(
@@ -119,6 +130,8 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      */
     public function createNationalBankOfRepublicBelarusDriver(): ExchangeRateProvider
     {
+        // identity | round:8 | indirect:BYN | rev | back | nbrb
+
         return new ExchangeRateProvider(
             new Identity(
                 new Round(

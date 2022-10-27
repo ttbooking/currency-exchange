@@ -46,7 +46,7 @@ class CurrencyExchangeServiceProvider extends ServiceProvider implements Deferra
         });
 
         $this->app->singleton('currency-exchange.provider', function ($app) {
-            return $app['currency-exchange']->driver();
+            return $app['currency-exchange']->provider();
         });
     }
 

@@ -14,7 +14,7 @@ use TTBooking\CurrencyExchange\ExchangeRateProvider;
  * @method static bool has(ExchangeRateQuery|string $query, mixed $date = null, array $options = [])
  * @method static ExchangeRateContract get(ExchangeRateQuery|string $query, mixed $date = null, array $options = [])
  *
- * @see \TTBooking\CurrencyExchange\Providers\Chain
+ * @see \TTBooking\CurrencyExchange\ExchangeRateManager
  */
 class ExchangeRate extends Facade
 {
