@@ -42,7 +42,7 @@ class ExchangeRateCacheStore implements ExchangeRateStore
     private function getCacheKey(ExchangeRateQuery|ExchangeRate $query): string
     {
         $cacheKeyPrefix = $this->options['cache_key_prefix'] ?? '';
-        $cacheKeyPrefix = preg_replace('#[{}()/\\\@:]#', '-', $cacheKeyPrefix);
+        $cacheKeyPrefix = preg_replace('#[{}()/\\\@]#', '-', $cacheKeyPrefix);
 
         $cacheKey = $cacheKeyPrefix.sha1($query->getCurrencyPair().$query->getDate()->format('Y-m-d'));
         if (strlen($cacheKey) > 64) {
