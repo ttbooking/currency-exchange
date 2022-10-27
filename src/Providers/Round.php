@@ -10,7 +10,7 @@ use TTBooking\CurrencyExchange\ExchangeRate;
 
 class Round implements ExchangeRateProvider
 {
-    public function __construct(protected ExchangeRateProvider $provider, protected int $precision = 4)
+    public function __construct(protected ExchangeRateProvider $provider, protected int $precision = 8)
     {
     }
 

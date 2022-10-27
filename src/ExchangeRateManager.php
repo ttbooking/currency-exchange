@@ -33,24 +33,32 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         return new ExchangeRateProvider(
             new Identity(
-                new Chain([
-                    new ReversibleExchangeRateProvider(
-                        new ExchangeRateCachingDecorator(
-                            new NationalBankOfRepublicBelarus,
-                            new ReversibleExchangeRateStore(
-                                new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
-                            )
-                        )
-                    ),
-                    new ReversibleExchangeRateProvider(
-                        new ExchangeRateCachingDecorator(
-                            new RussianCentralBank,
-                            new ReversibleExchangeRateStore(
-                                new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
-                            )
-                        )
-                    ),
-                ])
+                new Round(
+                    new Chain([
+                        new Indirect(
+                            new ReversibleExchangeRateProvider(
+                                new ExchangeRateCachingDecorator(
+                                    new NationalBankOfRepublicBelarus,
+                                    new ReversibleExchangeRateStore(
+                                        new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
+                                    )
+                                )
+                            ),
+                            'BYN'
+                        ),
+                        new Indirect(
+                            new ReversibleExchangeRateProvider(
+                                new ExchangeRateCachingDecorator(
+                                    new RussianCentralBank,
+                                    new ReversibleExchangeRateStore(
+                                        new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
+                                    )
+                                )
+                            ),
+                            'RUB'
+                        ),
+                    ])
+                )
             )
         );
     }
