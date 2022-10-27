@@ -144,7 +144,7 @@ class NationalBankOfRepublicBelarus extends HttpService
         }
 
         $date = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $entry['Date'] ?? null);
-        if (!$date || $date->format('Y-m-d') !== $query->getDate()->format('Y-m-d')) {
+        if (!$date /*|| $date->format('Y-m-d') !== $query->getDate()->format('Y-m-d')*/) {
             throw new UnsupportedExchangeQueryException;
         }
 

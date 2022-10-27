@@ -32,7 +32,7 @@ class RussianCentralBank extends HttpService
         $elements = $element->xpath('./Valute[CharCode="'.$baseCurrency.'"]');
         $responseDate = \DateTimeImmutable::createFromFormat('!d.m.Y', (string) $element['Date']);
 
-        if (empty($elements) || $query->isHistorical() && $formattedDate !== (string) $element['Date']) {
+        if (empty($elements) /*|| $query->isHistorical() && $formattedDate !== (string) $element['Date']*/) {
             throw new UnsupportedExchangeQueryException;
         }
 
