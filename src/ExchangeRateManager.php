@@ -64,15 +64,20 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         return new ExchangeRateProvider(
             new Identity(
-                new ReversibleExchangeRateProvider(
-                    new ExchangeRateCachingDecorator(
-                        new GatewayProxy(config: $this->config->get('currency-exchange.providers.gateway_proxy', [])),
-                        new ReversibleExchangeRateStore(
-                            new ExchangeRateCacheStore(
-                                $this->container['cache.store'],
-                                ['cache_key_prefix' => 'exchange_rates:', 'cache_ttl' => 86400]
+                new Round(
+                    new Indirect(
+                        new ReversibleExchangeRateProvider(
+                            new ExchangeRateCachingDecorator(
+                                new GatewayProxy(config: $this->config->get('currency-exchange.providers.gateway_proxy', [])),
+                                new ReversibleExchangeRateStore(
+                                    new ExchangeRateCacheStore(
+                                        $this->container['cache.store'],
+                                        ['cache_key_prefix' => 'exchange_rates:', 'cache_ttl' => 86400]
+                                    )
+                                )
                             )
-                        )
+                        ),
+                        'RUB'
                     )
                 )
             )
