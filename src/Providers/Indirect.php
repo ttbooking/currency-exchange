@@ -29,7 +29,7 @@ class Indirect implements ExchangeRateProvider
 
         return new ExchangeRate(
             $query->getCurrencyPair(),
-            $rate2->getValue() / $rate1->getValue(),
+            $rate1->getValue() / $rate2->getValue(),
             $rate1->getDate(),
             $rate1->getServiceName(),
         );
