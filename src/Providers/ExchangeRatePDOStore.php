@@ -82,7 +82,7 @@ class ExchangeRatePDOStore implements ExchangeRateStore
     private function getQuery(bool $serviceSpecified, bool $existsQuery = false): string
     {
         $serviceQuery = $serviceSpecified ? ' and service = ?' : '';
-        $query = "select rate, `date`, service from {$this->table} where base = ? and quote = ? and `date` <= ?{$serviceQuery} order by `date` desc, created_at limit 1";
+        $query = "select rate, `date`, service from {$this->table} where base = ? and quote = ? and `date` = ?{$serviceQuery} order by `date` desc, created_at limit 1";
 
         if ($existsQuery) {
             $query = "select exists ($query) as `exists`";
