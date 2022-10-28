@@ -74,7 +74,7 @@ SQL;
 
     public function store(ExchangeRateContract $exchangeRate): ExchangeRate
     {
-        $stat = $this->pdo->prepare("insert into {$this->table} (base, quote, factual_date, requested_date, service, rate) values (?, ?, ?, ?, ?, ?)");
+        $stat = $this->pdo->prepare("insert into {$this->table} (base, quote, factual_date, requested_date, service, rate) values (?, ?, ?, ?, ?, ?) on duplicate key update requested_date = ?");
 
         try {
             $stat->execute([
@@ -84,6 +84,7 @@ SQL;
                 $exchangeRate->getRequestedDate()->format('Y-m-d'),
                 $exchangeRate->getServiceName(),
                 $exchangeRate->getValue(),
+                $exchangeRate->getRequestedDate()->format('Y-m-d'),
             ]);
         } catch (PDOException $e) {
             throw new ExchangeRateStoreException(previous: $e);
