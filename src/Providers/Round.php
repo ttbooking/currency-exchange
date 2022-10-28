@@ -26,7 +26,8 @@ class Round implements ExchangeRateProvider
         return new ExchangeRate(
             $exchangeRate->getCurrencyPair(),
             round($exchangeRate->getValue(), $this->precision, PHP_ROUND_HALF_EVEN),
-            $exchangeRate->getDate(),
+            $exchangeRate->getFactualDate(),
+            $exchangeRate->getRequestedDate(),
             $exchangeRate->getServiceName()
         );
     }

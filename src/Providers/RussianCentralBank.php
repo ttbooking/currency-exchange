@@ -39,7 +39,7 @@ class RussianCentralBank extends HttpService
         $rate = str_replace(',', '.', (string) $elements['0']->Value);
         $nominal = str_replace(',', '.', (string) $elements['0']->Nominal);
 
-        return $this->createRate($currencyPair, $rate / $nominal, $responseDate);
+        return $this->createRate($currencyPair, $rate / $nominal, $responseDate, $query->getDate());
     }
 
     public function has(ExchangeRateQuery $query): bool

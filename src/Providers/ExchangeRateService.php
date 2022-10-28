@@ -13,8 +13,12 @@ abstract class ExchangeRateService implements ExchangeRateServiceContract
     /**
      * Creates an exchange rate.
      */
-    protected function createRate(CurrencyPair $currencyPair, float $rate, \DateTimeInterface $date): ExchangeRate
-    {
-        return new ExchangeRate($currencyPair, $rate, $date, $this->getName());
+    protected function createRate(
+        CurrencyPair $currencyPair,
+        float $rate,
+        \DateTimeInterface $factualDate,
+        \DateTimeInterface $requestedDate
+    ): ExchangeRate {
+        return new ExchangeRate($currencyPair, $rate, $factualDate, $requestedDate, $this->getName());
     }
 }

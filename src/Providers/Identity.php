@@ -24,7 +24,7 @@ class Identity implements ExchangeRateProvider
     public function get(ExchangeRateQuery $query): ExchangeRate
     {
         if ($query->getCurrencyPair()->isIdentical()) {
-            return new ExchangeRate($query->getCurrencyPair(), 1, $query->getDate() ?? new \DateTime);
+            return new ExchangeRate($query->getCurrencyPair(), 1, $query->getDate(), $query->getDate());
         }
 
         return $this->provider->get($query);

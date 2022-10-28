@@ -16,11 +16,13 @@ return new class extends Migration
         Schema::create('exchange_rates', function (Blueprint $table) {
             $table->char('base', 3);
             $table->char('quote', 3);
-            $table->date('date');
+            $table->date('factual_date');
+            $table->date('requested_date');
             $table->string('service');
             $table->unsignedDecimal('rate', 14, 8);
-            $table->primary(['base', 'quote', 'date', 'service']);
+            $table->primary(['base', 'quote', 'factual_date', 'service']);
             $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });
     }
 

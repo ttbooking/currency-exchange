@@ -151,7 +151,7 @@ class NationalBankOfRepublicBelarus extends HttpService
         $rate = $entry['Cur_OfficialRate'];
         $scale = $entry['Cur_Scale'] ?? 1;
 
-        return $this->createRate($currencyPair, $rate / $scale, $date);
+        return $this->createRate($currencyPair, $rate / $scale, $date, $query->getDate());
     }
 
     public function getName(): string

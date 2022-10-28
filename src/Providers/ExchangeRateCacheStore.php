@@ -44,7 +44,10 @@ class ExchangeRateCacheStore implements ExchangeRateStore
         $cacheKeyPrefix = $this->options['cache_key_prefix'] ?? '';
         $cacheKeyPrefix = preg_replace('#[{}()/\\\@]#', '-', $cacheKeyPrefix);
 
-        $cacheKey = $cacheKeyPrefix.sha1($query->getCurrencyPair().$query->getDate()->format('Y-m-d'));
+        $cacheKey = $cacheKeyPrefix.sha1(
+            $query->getCurrencyPair().
+            $query->getDate()->format('Y-m-d')
+        );
         if (strlen($cacheKey) > 64) {
             throw new \Exception("Cache key length exceeds 64 characters ('$cacheKey'). This violates PSR-6 standard");
         }

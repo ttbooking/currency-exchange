@@ -8,7 +8,9 @@ interface ExchangeRate extends \Stringable, \JsonSerializable
 {
     public function getValue(): float;
 
-    public function getDate(): \DateTimeInterface;
+    public function getFactualDate(): \DateTimeInterface;
+
+    public function getRequestedDate(): \DateTimeInterface;
 
     public function getCurrencyPair(): CurrencyPair;
 

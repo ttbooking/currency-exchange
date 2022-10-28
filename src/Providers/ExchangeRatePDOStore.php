@@ -14,6 +14,12 @@ use TTBooking\CurrencyExchange\ExchangeRate;
 
 class ExchangeRatePDOStore implements ExchangeRateStore
 {
+    protected const QUERY = <<<'SQL'
+select rate, factual_date, service
+from %s where base = ? and quote = ? and ? between factual_date and requested_date%s
+order by factual_date desc, updated_at limit 1
+SQL;
+
     public function __construct(protected PDO $pdo, protected string $table)
     {
     }
@@ -55,20 +61,27 @@ class ExchangeRatePDOStore implements ExchangeRateStore
             throw new UnsupportedExchangeQueryException;
         }
 
-        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $result[1]);
+        $factualDate = \DateTimeImmutable::createFromFormat('!Y-m-d', $result[1]);
 
-        return new ExchangeRate($query->getCurrencyPair(), (float) $value, $date, $result[2] ?? null);
+        return new ExchangeRate(
+            $query->getCurrencyPair(),
+            (float) $value,
+            $factualDate,
+            $query->getDate(),
+            $result[2] ?? null
+        );
     }
 
     public function store(ExchangeRateContract $exchangeRate): ExchangeRate
     {
-        $stat = $this->pdo->prepare("insert into {$this->table} (base, quote, date, service, rate) values (?, ?, ?, ?, ?)");
+        $stat = $this->pdo->prepare("insert into {$this->table} (base, quote, factual_date, requested_date, service, rate) values (?, ?, ?, ?, ?, ?)");
 
         try {
             $stat->execute([
                 $exchangeRate->getCurrencyPair()->getBaseCurrency(),
                 $exchangeRate->getCurrencyPair()->getQuoteCurrency(),
-                $exchangeRate->getDate()->format('Y-m-d'),
+                $exchangeRate->getFactualDate()->format('Y-m-d'),
+                $exchangeRate->getRequestedDate()->format('Y-m-d'),
                 $exchangeRate->getServiceName(),
                 $exchangeRate->getValue(),
             ]);
@@ -82,7 +95,7 @@ class ExchangeRatePDOStore implements ExchangeRateStore
     private function getQuery(bool $serviceSpecified, bool $existsQuery = false): string
     {
         $serviceQuery = $serviceSpecified ? ' and service = ?' : '';
-        $query = "select rate, `date`, service from {$this->table} where base = ? and quote = ? and `date` = ?{$serviceQuery} order by `date` desc, created_at limit 1";
+        $query = sprintf(static::QUERY, $this->table, $serviceQuery);
 
         if ($existsQuery) {
             $query = "select exists ($query) as `exists`";

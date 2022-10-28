@@ -12,7 +12,8 @@ final class ExchangeRate implements ExchangeRateContract
     public function __construct(
         private CurrencyPairContract $currencyPair,
         private float $value,
-        private \DateTimeInterface $date,
+        private \DateTimeInterface $factualDate,
+        private \DateTimeInterface $requestedDate,
         private ?string $serviceName = null,
     ) {
     }
@@ -27,9 +28,14 @@ final class ExchangeRate implements ExchangeRateContract
         return $this->value;
     }
 
-    public function getDate(): \DateTimeInterface
+    public function getFactualDate(): \DateTimeInterface
     {
-        return $this->date;
+        return $this->factualDate;
+    }
+
+    public function getRequestedDate(): \DateTimeInterface
+    {
+        return $this->requestedDate;
     }
 
     public function getServiceName(): ?string
@@ -39,7 +45,13 @@ final class ExchangeRate implements ExchangeRateContract
 
     public function swapCurrencyPair(): self
     {
-        return new self($this->currencyPair->swap(), 1 / $this->value, $this->date, $this->serviceName);
+        return new self(
+            $this->currencyPair->swap(),
+            1 / $this->value,
+            $this->factualDate,
+            $this->requestedDate,
+            $this->serviceName
+        );
     }
 
     public function __toString(): string
@@ -51,7 +63,8 @@ final class ExchangeRate implements ExchangeRateContract
     {
         return [
             'currency_pair' => $this->currencyPair,
-            'date' => $this->date->format('Y-m-d'),
+            'factual_date' => $this->factualDate->format('Y-m-d'),
+            'requested_date' => $this->requestedDate->format('Y-m-d'),
             'service' => $this->serviceName,
             'rate' => $this->value,
         ];
@@ -62,7 +75,8 @@ final class ExchangeRate implements ExchangeRateContract
         return new self(
             CurrencyPair::fromArray($exchangeRate['currency_pair']),
             $exchangeRate['rate'],
-            new \DateTimeImmutable($exchangeRate['date']),
+            new \DateTimeImmutable($exchangeRate['factual_date']),
+            new \DateTimeImmutable($exchangeRate['requested_date']),
             $exchangeRate['service']
         );
     }
