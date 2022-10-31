@@ -43,6 +43,11 @@ final class ExchangeRate implements ExchangeRateContract
         return $this->serviceName;
     }
 
+    public function isAuthoritative(): bool
+    {
+        return !($this->requestedDate > $this->factualDate && $this->requestedDate > new \DateTimeImmutable);
+    }
+
     public function swapCurrencyPair(): self
     {
         return new self(

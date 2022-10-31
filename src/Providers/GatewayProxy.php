@@ -45,17 +45,10 @@ class GatewayProxy extends HttpService
 
     private function buildUrl(ExchangeRateQuery $query): string
     {
-        return $query->isHistorical()
-
-            ? sprintf('%s/%s/%s?date=%s', $this->config['url'],
-                $query->getCurrencyPair()->getBaseCurrency(),
-                $query->getCurrencyPair()->getQuoteCurrency(),
-                $query->getDate()->format('Y-m-d'),
-            )
-
-            : sprintf('%s/%s/%s', $this->config['url'],
-                $query->getCurrencyPair()->getBaseCurrency(),
-                $query->getCurrencyPair()->getQuoteCurrency(),
-            );
+        return sprintf('%s/%s/%s?date=%s', $this->config['url'],
+            $query->getCurrencyPair()->getBaseCurrency(),
+            $query->getCurrencyPair()->getQuoteCurrency(),
+            $query->getDate()->format('Y-m-d'),
+        );
     }
 }

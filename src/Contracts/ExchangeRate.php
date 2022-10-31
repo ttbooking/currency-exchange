@@ -14,6 +14,8 @@ interface ExchangeRate extends \Stringable, \JsonSerializable
 
     public function getCurrencyPair(): CurrencyPair;
 
+    public function isAuthoritative(): bool;
+
     public function getServiceName(): ?string;
 
     public function swapCurrencyPair(): self;

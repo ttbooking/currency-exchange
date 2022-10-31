@@ -17,8 +17,8 @@ abstract class ExchangeRateService implements ExchangeRateServiceContract
         CurrencyPair $currencyPair,
         float $rate,
         \DateTimeInterface $factualDate,
-        \DateTimeInterface $requestedDate
+        \DateTimeInterface $requestedDate = null
     ): ExchangeRate {
-        return new ExchangeRate($currencyPair, $rate, $factualDate, $requestedDate, $this->getName());
+        return new ExchangeRate($currencyPair, $rate, $factualDate, $requestedDate ?? $factualDate, $this->getName());
     }
 }

@@ -30,8 +30,12 @@ class ExchangeRateCachingDecorator implements ExchangeRateProvider
             return $this->store->get($query);
         }
 
-        return $this->store->store(
-            $this->provider->get($query)
-        );
+        $exchangeRate = $this->provider->get($query);
+
+        if ($exchangeRate->isAuthoritative()) {
+            $this->store->store($exchangeRate);
+        }
+
+        return $exchangeRate;
     }
 }

@@ -14,6 +14,7 @@ final class ExchangeRateQuery implements ExchangeRateQueryContract
         private ?\DateTimeInterface $date = null,
         private array $options = [],
     ) {
+        $this->date ??= new \DateTimeImmutable;
     }
 
     public function getCurrencyPair(): CurrencyPair
@@ -23,17 +24,12 @@ final class ExchangeRateQuery implements ExchangeRateQueryContract
 
     public function getDate(): \DateTimeInterface
     {
-        return $this->date ?? new \DateTimeImmutable;
+        return $this->date;
     }
 
     public function getOption(string $name, mixed $default = null): mixed
     {
         return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
-    }
-
-    public function isHistorical(): bool
-    {
-        return isset($this->date);
     }
 
     public function swapCurrencyPair(): self

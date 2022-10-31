@@ -18,7 +18,7 @@ class NationalBankOfRepublicBelarus extends HttpService
         $currencyPair = $query->getCurrencyPair();
         $baseCurrency = $currencyPair->getBaseCurrency();
         $quoteCurrency = $currencyPair->getQuoteCurrency();
-        $date = $query->isHistorical() && !$ignoreSupportPeriod ? $query->getDate() : null;
+        $date = !$ignoreSupportPeriod ? $query->getDate() : null;
 
         return is_int(self::detectPeriodicity($baseCurrency, $date))
             && self::supportQuoteCurrency($quoteCurrency, $date);
@@ -115,11 +115,11 @@ class NationalBankOfRepublicBelarus extends HttpService
             throw new UnsupportedExchangeQueryException;
         }
 
-        if ($query->isHistorical() && $query->getDate()->format('Y-m-d') < '1995-03-29') {
+        if ($query->getDate()->format('Y-m-d') < '1995-03-29') {
             throw new UnsupportedExchangeQueryException;
         }
 
-        $content = $this->request($this->buildUrl($baseCurrency, $query->isHistorical() ? $query->getDate() : null));
+        $content = $this->request($this->buildUrl($baseCurrency, $query->getDate()));
         $result = StringUtil::jsonToArray($content);
         $entryId = array_search($baseCurrency, array_column($result, 'Cur_Abbreviation'));
 
@@ -144,7 +144,7 @@ class NationalBankOfRepublicBelarus extends HttpService
         }
 
         $date = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $entry['Date'] ?? null);
-        if (!$date /*|| $date->format('Y-m-d') !== $query->getDate()->format('Y-m-d')*/) {
+        if (!$date) {
             throw new UnsupportedExchangeQueryException;
         }
 
@@ -163,15 +163,15 @@ class NationalBankOfRepublicBelarus extends HttpService
      * Builds the url.
      *
      * @param string $baseCurrency
-     * @param \DateTimeInterface|null $requestedDate
+     * @param \DateTimeInterface $requestedDate
      *
      * @return string
      */
-    private function buildUrl(string $baseCurrency, \DateTimeInterface $requestedDate = null): string
+    private function buildUrl(string $baseCurrency, \DateTimeInterface $requestedDate): string
     {
-        $data = isset($requestedDate) ? ['ondate' => $requestedDate->format('Y-m-d')] : [];
-        $data += ['periodicity' => (int) self::detectPeriodicity($baseCurrency, $requestedDate)];
-
-        return static::URL.'?'.http_build_query($data);
+        return static::URL.'?'.http_build_query([
+            'ondate' => $requestedDate->format('Y-m-d'),
+            'periodicity' => (int) self::detectPeriodicity($baseCurrency, $requestedDate),
+        ]);
     }
 }

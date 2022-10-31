@@ -21,18 +21,14 @@ class RussianCentralBank extends HttpService
 
         $currencyPair = $query->getCurrencyPair();
         $baseCurrency = $currencyPair->getBaseCurrency();
-        $formattedDate = $query->getDate()->format('d.m.Y');
 
-        $content = $this->request($query->isHistorical()
-            ? static::URL.'?'.http_build_query(['date_req' => $formattedDate])
-            : static::URL
-        );
+        $content = $this->request($this->buildUrl($query->getDate()));
         $element = StringUtil::xmlToElement($content);
 
         $elements = $element->xpath('./Valute[CharCode="'.$baseCurrency.'"]');
         $responseDate = \DateTimeImmutable::createFromFormat('!d.m.Y', (string) $element['Date']);
 
-        if (empty($elements) /*|| $query->isHistorical() && $formattedDate !== (string) $element['Date']*/) {
+        if (empty($elements)) {
             throw new UnsupportedExchangeQueryException;
         }
 
@@ -50,5 +46,17 @@ class RussianCentralBank extends HttpService
     public function getName(): string
     {
         return 'russian_central_bank';
+    }
+
+    /**
+     * Builds the url.
+     *
+     * @param \DateTimeInterface $requestedDate
+     *
+     * @return string
+     */
+    private function buildUrl(\DateTimeInterface $requestedDate): string
+    {
+        return static::URL.'?'.http_build_query(['date_req' => $requestedDate->format('d.m.Y')]);
     }
 }
