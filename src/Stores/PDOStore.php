@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TTBooking\CurrencyExchange\Providers;
+namespace TTBooking\CurrencyExchange\Stores;
 
 use PDO, PDOException;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate as ExchangeRateContract;
@@ -12,7 +12,7 @@ use TTBooking\CurrencyExchange\Exceptions\ExchangeRateStoreException;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 use TTBooking\CurrencyExchange\ExchangeRate;
 
-class ExchangeRatePDOStore implements ExchangeRateStore
+class PDOStore implements ExchangeRateStore
 {
     protected const QUERY = <<<'SQL'
 select rate, factual_date, service

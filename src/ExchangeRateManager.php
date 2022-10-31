@@ -8,19 +8,19 @@ use Illuminate\Support\Manager;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider as ExchangeRateProviderContract;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery as ExchangeRateQueryContract;
+use TTBooking\CurrencyExchange\Decorators\Cache;
+use TTBooking\CurrencyExchange\Decorators\Chain;
+use TTBooking\CurrencyExchange\Decorators\Cross;
+use TTBooking\CurrencyExchange\Decorators\Identity;
+use TTBooking\CurrencyExchange\Decorators\Reverse;
+use TTBooking\CurrencyExchange\Decorators\ReverseStore;
+use TTBooking\CurrencyExchange\Decorators\Round;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
-use TTBooking\CurrencyExchange\Providers\Chain;
-use TTBooking\CurrencyExchange\Providers\ExchangeRateCacheStore;
-use TTBooking\CurrencyExchange\Providers\ExchangeRateCachingDecorator;
-use TTBooking\CurrencyExchange\Providers\ExchangeRatePDOStore;
-use TTBooking\CurrencyExchange\Providers\GatewayProxy;
-use TTBooking\CurrencyExchange\Providers\Identity;
-use TTBooking\CurrencyExchange\Providers\Indirect;
 use TTBooking\CurrencyExchange\Providers\NationalBankOfRepublicBelarus;
-use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateProvider;
-use TTBooking\CurrencyExchange\Providers\ReversibleExchangeRateStore;
-use TTBooking\CurrencyExchange\Providers\Round;
+use TTBooking\CurrencyExchange\Providers\Proxy;
 use TTBooking\CurrencyExchange\Providers\RussianCentralBank;
+use TTBooking\CurrencyExchange\Stores\CacheStore;
+use TTBooking\CurrencyExchange\Stores\PDOStore;
 
 class ExchangeRateManager extends Manager implements ExchangeRateProviderContract
 {
@@ -32,38 +32,23 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     public function createChainDriver(): ExchangeRateProvider
     {
         /**
-         * identity | round:8 | indirect:RUB | chain | (
+         * identity | round:8 | cross:RUB | chain | (
          *     rev | back:(rev|pdo:exchange_rates) | nbrb,
          *     rev | back:(rev|pdo:exchange_rates) | cbrf
          * )
          */
 
         return new ExchangeRateProvider(
-            new Identity(
-                new Round(
-                    new Indirect(
-                        new Chain([
-                            new ReversibleExchangeRateProvider(
-                                new ExchangeRateCachingDecorator(
-                                    new NationalBankOfRepublicBelarus,
-                                    new ReversibleExchangeRateStore(
-                                        new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
-                                    )
-                                )
-                            ),
-                            new ReversibleExchangeRateProvider(
-                                new ExchangeRateCachingDecorator(
-                                    new RussianCentralBank,
-                                    new ReversibleExchangeRateStore(
-                                        new ExchangeRatePDOStore($this->container['db']->getPdo(), 'exchange_rates')
-                                    )
-                                )
-                            ),
-                        ]),
-                        'RUB'
-                    )
-                )
-            )
+            new Identity(new Round(new Cross(new Chain([
+                new Reverse(new Cache(
+                    new NationalBankOfRepublicBelarus,
+                    new ReverseStore(new PDOStore($this->container['db']->getPdo(), 'exchange_rates'))
+                )),
+                new Reverse(new Cache(
+                    new RussianCentralBank,
+                    new ReverseStore(new PDOStore($this->container['db']->getPdo(), 'exchange_rates'))
+                )),
+            ]), 'RUB')))
         );
     }
 
@@ -74,27 +59,16 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      */
     public function createGatewayProxyDriver(): ExchangeRateProvider
     {
-        // identity | round:8 | indirect:RUB | rev | back:(rev|cache:exchange_rates,86400) | proxy:cxwb/api/rate
+        // identity | round:8 | cross:RUB | rev | back:(rev|cache:exchange_rates,86400) | proxy:cxwb/api/rate
 
         return new ExchangeRateProvider(
-            new Identity(
-                new Round(
-                    new Indirect(
-                        new ReversibleExchangeRateProvider(
-                            new ExchangeRateCachingDecorator(
-                                new GatewayProxy(config: $this->config->get('currency-exchange.providers.gateway_proxy', [])),
-                                new ReversibleExchangeRateStore(
-                                    new ExchangeRateCacheStore(
-                                        $this->container['cache.store'],
-                                        ['cache_key_prefix' => 'exchange_rates:', 'cache_ttl' => 86400]
-                                    )
-                                )
-                            )
-                        ),
-                        'RUB'
-                    )
-                )
-            )
+            new Identity(new Round(new Cross(new Reverse(new Cache(
+                new Proxy(config: $this->config->get('currency-exchange.providers.gateway_proxy', [])),
+                new ReverseStore(new CacheStore(
+                    $this->container['cache.store'],
+                    ['cache_key_prefix' => 'exchange_rates:', 'cache_ttl' => 86400]
+                ))
+            )), 'RUB')))
         );
     }
 
@@ -105,21 +79,12 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      */
     public function createRussianCentralBankDriver(): ExchangeRateProvider
     {
-        // identity | round:8 | indirect:RUB | rev | back | cbrf
+        // identity | round:8 | cross:RUB | rev | back | cbrf
 
         return new ExchangeRateProvider(
-            new Identity(
-                new Round(
-                    new Indirect(
-                        new ReversibleExchangeRateProvider(
-                            new ExchangeRateCachingDecorator(
-                                new RussianCentralBank
-                            )
-                        ),
-                        'RUB'
-                    )
-                )
-            )
+            new Identity(new Round(new Cross(new Reverse(new Cache(
+                new RussianCentralBank
+            )), 'RUB')))
         );
     }
 
@@ -130,21 +95,12 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      */
     public function createNationalBankOfRepublicBelarusDriver(): ExchangeRateProvider
     {
-        // identity | round:8 | indirect:BYN | rev | back | nbrb
+        // identity | round:8 | cross:BYN | rev | back | nbrb
 
         return new ExchangeRateProvider(
-            new Identity(
-                new Round(
-                    new Indirect(
-                        new ReversibleExchangeRateProvider(
-                            new ExchangeRateCachingDecorator(
-                                new NationalBankOfRepublicBelarus
-                            )
-                        ),
-                        'BYN'
-                    )
-                )
-            )
+            new Identity(new Round(new Cross(new Reverse(new Cache(
+                new NationalBankOfRepublicBelarus
+            )), 'BYN')))
         );
     }
 

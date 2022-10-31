@@ -28,7 +28,7 @@ class NationalBankOfRepublicBelarus extends HttpService
      * Tells if the service supports base currency for the given date and detect its periodicity if it does.
      *
      * @param string $baseCurrency
-     * @param \DateTimeInterface|null $date
+     * @param \DateTimeInterface|NullProvider $date
      *
      * @return int|false
      */
@@ -62,7 +62,7 @@ class NationalBankOfRepublicBelarus extends HttpService
      * Tells if the service supports quote currency for the given date.
      *
      * @param string $quoteCurrency
-     * @param \DateTimeInterface|null $date
+     * @param \DateTimeInterface|NullProvider $date
      *
      * @return bool
      */

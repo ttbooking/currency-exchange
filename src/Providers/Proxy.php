@@ -10,7 +10,7 @@ use TTBooking\CurrencyExchange\ExchangeRate;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\StringUtil;
 
-class GatewayProxy extends HttpService
+class Proxy extends HttpService
 {
     public function __construct(
         ?ClientInterface $httpClient = null,

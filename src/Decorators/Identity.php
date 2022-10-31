@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace TTBooking\CurrencyExchange\Providers;
+namespace TTBooking\CurrencyExchange\Decorators;
 
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\ExchangeRate;
+use TTBooking\CurrencyExchange\Providers\NullProvider;
 
 class Identity implements ExchangeRateProvider
 {
     public function __construct(protected ?ExchangeRateProvider $provider = null)
     {
-        $this->provider ??= new ExchangeRateNullProvider;
+        $this->provider ??= new NullProvider;
     }
 
     public function has(ExchangeRateQuery $query): bool

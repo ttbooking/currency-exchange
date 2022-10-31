@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TTBooking\CurrencyExchange\Providers;
+namespace TTBooking\CurrencyExchange\Decorators;
 
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;

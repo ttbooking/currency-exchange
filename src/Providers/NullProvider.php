@@ -9,7 +9,7 @@ use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 use TTBooking\CurrencyExchange\ExchangeRate;
 
-class ExchangeRateNullProvider implements ExchangeRateProvider
+class NullProvider implements ExchangeRateProvider
 {
     public function has(ExchangeRateQuery $query): bool
     {

@@ -62,4 +62,11 @@ final class CurrencyPair implements CurrencyPairContract
     {
         return new self($currencyPair['base'], $currencyPair['quote']);
     }
+
+    public static function parse(string|array $currencyPair): self
+    {
+        return is_string($currencyPair)
+            ? self::fromString($currencyPair)
+            : self::fromArray($currencyPair);
+    }
 }

@@ -67,7 +67,7 @@ final class ExchangeRate implements ExchangeRateContract
     public function jsonSerialize(): array
     {
         return [
-            'currency_pair' => $this->currencyPair,
+            'currency_pair' => (string) $this->currencyPair,
             'factual_date' => $this->factualDate->format('Y-m-d'),
             'requested_date' => $this->requestedDate->format('Y-m-d'),
             'service' => $this->serviceName,
@@ -78,7 +78,7 @@ final class ExchangeRate implements ExchangeRateContract
     public static function fromArray(array $exchangeRate): self
     {
         return new self(
-            CurrencyPair::fromArray($exchangeRate['currency_pair']),
+            CurrencyPair::parse($exchangeRate['currency_pair']),
             $exchangeRate['rate'],
             new \DateTimeImmutable($exchangeRate['factual_date']),
             new \DateTimeImmutable($exchangeRate['requested_date']),

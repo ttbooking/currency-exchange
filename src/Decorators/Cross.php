@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TTBooking\CurrencyExchange\Providers;
+namespace TTBooking\CurrencyExchange\Decorators;
 
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery as ExchangeRateQueryContract;
@@ -10,7 +10,7 @@ use TTBooking\CurrencyExchange\CurrencyPair;
 use TTBooking\CurrencyExchange\ExchangeRate;
 use TTBooking\CurrencyExchange\ExchangeRateQuery;
 
-class Indirect implements ExchangeRateProvider
+class Cross implements ExchangeRateProvider
 {
     public function __construct(protected ExchangeRateProvider $provider, protected string $throughCurrency)
     {

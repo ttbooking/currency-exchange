@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace TTBooking\CurrencyExchange\Providers;
+namespace TTBooking\CurrencyExchange\Decorators;
 
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 
-class ReversibleExchangeRateProvider implements ExchangeRateProvider
+class Reverse implements ExchangeRateProvider
 {
     public function __construct(protected ExchangeRateProvider $provider)
     {

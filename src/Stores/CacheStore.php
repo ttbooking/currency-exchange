@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TTBooking\CurrencyExchange\Providers;
+namespace TTBooking\CurrencyExchange\Stores;
 
 use Psr\SimpleCache\CacheInterface;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate;
@@ -10,7 +10,7 @@ use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateStore;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 
-class ExchangeRateCacheStore implements ExchangeRateStore
+class CacheStore implements ExchangeRateStore
 {
     public function __construct(
         protected CacheInterface $cache,
