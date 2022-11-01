@@ -60,6 +60,6 @@ class CurrencyExchangeServiceProvider extends ServiceProvider implements Deferra
      */
     public function provides(): array
     {
-        return ['currency-exchange', 'currency-exchange.provider'];
+        return ['currency-exchange', 'currency-exchange.provider', ExchangeRateProvider::class];
     }
 }
