@@ -6,6 +6,7 @@ namespace TTBooking\CurrencyExchange;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
+use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider;
 
 class CurrencyExchangeServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -48,6 +49,8 @@ class CurrencyExchangeServiceProvider extends ServiceProvider implements Deferra
         $this->app->singleton('currency-exchange.provider', function ($app) {
             return $app['currency-exchange']->provider();
         });
+
+        $this->app->bind(ExchangeRateProvider::class, 'currency-exchange.provider');
     }
 
     /**
