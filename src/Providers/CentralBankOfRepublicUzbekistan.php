@@ -11,7 +11,7 @@ use TTBooking\CurrencyExchange\StringUtil;
 
 class CentralBankOfRepublicUzbekistan extends HttpService
 {
-    protected const URL = 'https://cbu.uz/common/json';
+    protected const URL = 'https://cbu.uz/common/json/';
 
     public function has(ExchangeRateQuery $query): bool
     {
