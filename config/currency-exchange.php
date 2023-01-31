@@ -15,6 +15,7 @@ return [
         'chain' => [
             'services' => [
                 'national_bank_of_republic_belarus',
+                'central_bank_of_republic_uzbekistan',
                 'russian_central_bank',
             ],
         ],

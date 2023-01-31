@@ -23,7 +23,7 @@
         "psr/simple-cache": "^1.0 || ^2.0 || ^3.0"
     },
     "require-dev": {
-        "laravel/framework": "^9.0",
+        "laravel/framework": "^9.0 || ^10.0",
         "phpunit/phpunit": "^9.5",
         "php-http/message": "^1.7",
         "php-http/mock-client": "^1.0",

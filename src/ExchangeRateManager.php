@@ -16,6 +16,7 @@ use TTBooking\CurrencyExchange\Decorators\Reverse;
 use TTBooking\CurrencyExchange\Decorators\ReverseStore;
 use TTBooking\CurrencyExchange\Decorators\Round;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
+use TTBooking\CurrencyExchange\Providers\CentralBankOfRepublicUzbekistan;
 use TTBooking\CurrencyExchange\Providers\NationalBankOfRepublicBelarus;
 use TTBooking\CurrencyExchange\Providers\Proxy;
 use TTBooking\CurrencyExchange\Providers\RussianCentralBank;
@@ -34,6 +35,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
         /**
          * identity | round:8 | cross:RUB | chain | (
          *     rev | back:(rev|pdo:exchange_rates) | nbrb,
+         *     rev | back:(rev|pdo:exchange_rates) | cbu,
          *     rev | back:(rev|pdo:exchange_rates) | cbrf
          * )
          */
@@ -42,6 +44,10 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
             new Identity(new Round(new Cross(new Chain([
                 new Reverse(new Cache(
                     new NationalBankOfRepublicBelarus,
+                    new ReverseStore(new PDOStore($this->container['db']->getPdo(), 'exchange_rates'))
+                )),
+                new Reverse(new Cache(
+                    new CentralBankOfRepublicUzbekistan,
                     new ReverseStore(new PDOStore($this->container['db']->getPdo(), 'exchange_rates'))
                 )),
                 new Reverse(new Cache(
@@ -101,6 +107,22 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
             new Identity(new Round(new Cross(new Reverse(new Cache(
                 new NationalBankOfRepublicBelarus
             )), 'BYN')))
+        );
+    }
+
+    /**
+     * Create an instance of the Central Bank of the Republic of Uzbekistan service.
+     *
+     * @return ExchangeRateProvider
+     */
+    public function createCentralBankOfRepublicUzbekistanDriver(): ExchangeRateProvider
+    {
+        // identity | round:8 | cross:UZS | rev | back | cbu
+
+        return new ExchangeRateProvider(
+            new Identity(new Round(new Cross(new Reverse(new Cache(
+                new CentralBankOfRepublicUzbekistan
+            )), 'UZS')))
         );
     }
 
