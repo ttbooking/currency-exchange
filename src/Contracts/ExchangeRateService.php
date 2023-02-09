@@ -6,5 +6,5 @@ namespace TTBooking\CurrencyExchange\Contracts;
 
 interface ExchangeRateService extends ExchangeRateProvider
 {
-    public function getName(): string;
+    public static function getName(): string;
 }

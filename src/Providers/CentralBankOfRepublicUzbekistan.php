@@ -40,11 +40,6 @@ class CentralBankOfRepublicUzbekistan extends HttpService
         throw new UnsupportedExchangeQueryException;
     }
 
-    public function getName(): string
-    {
-        return 'central_bank_of_republic_uzbekistan';
-    }
-
     /**
      * Builds the url.
      *

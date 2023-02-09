@@ -78,11 +78,6 @@ class BankCenterCreditKazakhstan extends HttpService
         return $this->createRate($currencyPair, $entry[$operation], $date, $query->getDate());
     }
 
-    public function getName(): string
-    {
-        return 'bank_center_credit_kazakhstan';
-    }
-
     private function getToken(): string
     {
         $clientId = $this->config['client_id'] ?? '';

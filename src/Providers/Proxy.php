@@ -12,6 +12,8 @@ use TTBooking\CurrencyExchange\StringUtil;
 
 class Proxy extends HttpService
 {
+    protected const SERVICE_NAME = 'currency_exchange_gateway';
+
     public function __construct(
         protected array $config = [],
         ?ClientInterface $httpClient = null,
@@ -36,11 +38,6 @@ class Proxy extends HttpService
         $result = StringUtil::jsonToArray($content);
 
         return ExchangeRate::fromArray($result);
-    }
-
-    public function getName(): string
-    {
-        return 'currency_exchange_gateway';
     }
 
     private function buildUrl(ExchangeRateQuery $query): string

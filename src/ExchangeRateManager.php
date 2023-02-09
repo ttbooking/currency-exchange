@@ -6,6 +6,7 @@ namespace TTBooking\CurrencyExchange;
 
 use Generator;
 use Illuminate\Support\Manager;
+use InvalidArgumentException;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateProvider as ExchangeRateProviderContract;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery as ExchangeRateQueryContract;
@@ -46,13 +47,12 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
          */
 
         return new ExchangeRateProvider(
-            new Identity(new Round(new Cross(new Chain($this->createServiceChain([
-                NationalBankOfRepublicBelarus::class,
-                new BankCenterCreditKazakhstan($this->config->get('currency-exchange.providers.bank_center_credit_kazakhstan', [])),
-                NationalBankOfRepublicKazakhstan::class,
-                CentralBankOfRepublicUzbekistan::class,
-                RussianCentralBank::class,
-            ])), 'RUB')))
+            new Identity(new Round(new Cross(
+                new Chain($this->decorateServiceChain(
+                    $this->config->get('currency-exchange.providers.chain.services', [])
+                )),
+                $this->config->get('currency-exchange.providers.chain.cross_currency', 'RUB')
+            )))
         );
     }
 
@@ -61,12 +61,14 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      *
      * @return ExchangeRateProvider
      */
-    public function createGatewayProxyDriver(): ExchangeRateProvider
+    public function createCurrencyExchangeGatewayDriver(): ExchangeRateProvider
     {
-        // identity | round:8 | cross:RUB | rev | back:(rev|cache:exchange_rates,86400) | proxy:cxwb/api/rate
+        // identity | round:8 | cross:RUB | rev | back:(rev|cache:exchange_rates,86400) | proxy:cxgw/api/rate
 
-        return $this->createService(
-            new Proxy($this->config->get('currency-exchange.providers.gateway_proxy', [])), 'RUB', true
+        return $this->decorateService(
+            Proxy::class,
+            $this->config->get('currency-exchange.providers.currency_exchange_gateway.cross_currency', 'RUB'),
+            cache: true
         );
     }
 
@@ -79,7 +81,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         // identity | round:8 | cross:RUB | rev | back | cbrf
 
-        return $this->createService(RussianCentralBank::class, 'RUB');
+        return $this->decorateService(RussianCentralBank::class, 'RUB');
     }
 
     /**
@@ -91,7 +93,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         // identity | round:8 | cross:BYN | rev | back | nbrb
 
-        return $this->createService(NationalBankOfRepublicBelarus::class, 'BYN');
+        return $this->decorateService(NationalBankOfRepublicBelarus::class, 'BYN');
     }
 
     /**
@@ -103,7 +105,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         // identity | round:8 | cross:KZT | rev | back | nbrk
 
-        return $this->createService(NationalBankOfRepublicKazakhstan::class, 'KZT');
+        return $this->decorateService(NationalBankOfRepublicKazakhstan::class, 'KZT');
     }
 
     /**
@@ -115,12 +117,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         // identity | round:8 | cross:KZT | rev | back | bcck
 
-        return $this->createService(
-            new BankCenterCreditKazakhstan(
-                $this->config->get('currency-exchange.providers.bank_center_credit_kazakhstan', [])
-            ),
-            'KZT'
-        );
+        return $this->decorateService(BankCenterCreditKazakhstan::class, 'KZT');
     }
 
     /**
@@ -132,7 +129,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     {
         // identity | round:8 | cross:UZS | rev | back | cbu
 
-        return $this->createService(CentralBankOfRepublicUzbekistan::class, 'UZS');
+        return $this->decorateService(CentralBankOfRepublicUzbekistan::class, 'UZS');
     }
 
     /**
@@ -175,7 +172,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
      * @param  string|null  $provider
      * @return ExchangeRateProvider
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function provider(string $provider = null): ExchangeRateProvider
     {
@@ -183,29 +180,54 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     }
 
     /**
-     * Create a decorated instance of the specific service.
+     * Create an instance of the specific service.
      *
-     * @param  ExchangeRateService|class-string<ExchangeRateService>  $service
-     * @param  string  $crossCurrency
-     * @param  bool  $cache
-     * @return ExchangeRateProvider
+     * @param  ExchangeRateService|string  $service
+     * @param  array|null  $config
+     * @return ExchangeRateProviderContract
      */
     protected function createService(
         ExchangeRateService|string $service,
-        string $crossCurrency,
-        bool $cache = false
-    ): ExchangeRateProvider {
-        if (is_string($service)) {
-            $service = $this->container->make($service);
+        array $config = null
+    ): ExchangeRateProviderContract {
+        if (! is_string($service)) {
+            return $service;
         }
 
+        try {
+            return $this->provider($service);
+        } catch (InvalidArgumentException) {
+            $config ??= $this->config->get(
+                $this->config->has($key = 'currency-exchange.providers.'.$service::getName())
+                    ? $key : 'currency-exchange.providers.'.$service, []
+            );
+
+            return $this->container->make($service, compact('config'));
+        }
+    }
+
+    /**
+     * Create a decorated instance of the specific service.
+     *
+     * @param  ExchangeRateService|string  $service
+     * @param  string  $crossCurrency
+     * @param  array|null  $config
+     * @param  bool  $cache
+     * @return ExchangeRateProvider
+     */
+    protected function decorateService(
+        ExchangeRateService|string $service,
+        string $crossCurrency,
+        array $config = null,
+        bool $cache = false
+    ): ExchangeRateProvider {
         return new ExchangeRateProvider(
             new Identity(new Round(new Cross(new Reverse(new Cache(
-                $service,
+                $this->createService($service, $config),
                 $cache
                     ? new ReverseStore(new CacheStore(
                         $this->container['cache.store'],
-                        ['cache_key_prefix' => 'exchange_rates:', 'cache_ttl' => 86400]
+                        $this->config->get('currency-exchange.stores.cache', [])
                     ))
                     : null
             )), $crossCurrency)))
@@ -213,15 +235,20 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     }
 
     /**
-     * @param  iterable<ExchangeRateService|class-string<ExchangeRateService>>  $services
+     * @param  iterable<int|class-string<ExchangeRateService>, ExchangeRateService|string|array>  $services
      * @return Generator<int, ExchangeRateProviderContract>
      */
-    protected function createServiceChain(iterable $services): Generator
+    protected function decorateServiceChain(iterable $services): Generator
     {
-        foreach ($services as $service) {
+        foreach ($services as $service => $config) {
             yield new Reverse(new Cache(
-                is_string($service) ? $this->container->make($service) : $service,
-                new ReverseStore(new PDOStore($this->container['db']->getPdo(), 'exchange_rates'))
+                is_array($config)
+                    ? $this->createService($service, $config)
+                    : $this->createService($config),
+                new ReverseStore(new PDOStore(
+                    $this->container['db']->getPdo(),
+                    $this->config->get('currency-exchange.stores.database.table', 'exchange_rates')
+                ))
             ));
         }
     }

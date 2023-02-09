@@ -154,11 +154,6 @@ class NationalBankOfRepublicBelarus extends HttpService
         return $this->createRate($currencyPair, $rate / $unit, $date, $query->getDate());
     }
 
-    public function getName(): string
-    {
-        return 'national_bank_of_republic_belarus';
-    }
-
     /**
      * Builds the url.
      *

@@ -14,11 +14,18 @@ return [
 
         'chain' => [
             'services' => [
-                'national_bank_of_republic_belarus',
-                'national_bank_of_republic_kazakhstan',
-                'central_bank_of_republic_uzbekistan',
-                'russian_central_bank',
+                TTBooking\CurrencyExchange\Providers\NationalBankOfRepublicBelarus::class,
+                TTBooking\CurrencyExchange\Providers\BankCenterCreditKazakhstan::class,
+                TTBooking\CurrencyExchange\Providers\NationalBankOfRepublicKazakhstan::class,
+                TTBooking\CurrencyExchange\Providers\CentralBankOfRepublicUzbekistan::class,
+                TTBooking\CurrencyExchange\Providers\RussianCentralBank::class,
             ],
+            'cross_currency' => env('CX_CHAIN_CROSS', env('CX_CROSS', 'RUB')),
+        ],
+
+        'currency_exchange_gateway' => [
+            'url' => env('CX_PROXY_URL'),
+            'cross_currency' => env('CX_PROXY_CROSS', env('CX_CROSS', 'RUB')),
         ],
 
         'bank_center_credit_kazakhstan' => [
@@ -27,16 +34,17 @@ return [
             'sell' => env('CX_BCC_SELL', true),
         ],
 
+    ],
+
+    'stores' => [
+
         'cache' => [
-            'ttl' => env('CX_CACHE_TTL', 3600),
+            'key_prefix' => env('CX_CACHE_PREFIX', 'exchange_rates:'),
+            'ttl' => env('CX_CACHE_TTL', 86400),
         ],
 
         'database' => [
             'table' => env('CX_TABLE', 'exchange_rates'),
-        ],
-
-        'gateway_proxy' => [
-            'url' => env('CX_PROXY_URL'),
         ],
 
     ],

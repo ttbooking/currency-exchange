@@ -41,7 +41,7 @@ class CacheStore implements ExchangeRateStore
 
     private function getCacheKey(ExchangeRateQuery|ExchangeRate $query): string
     {
-        $cacheKeyPrefix = $this->options['cache_key_prefix'] ?? '';
+        $cacheKeyPrefix = $this->options['key_prefix'] ?? '';
         $cacheKeyPrefix = preg_replace('#[{}()/\\\@]#', '-', $cacheKeyPrefix);
 
         $date = $query instanceof ExchangeRateQuery ? $query->getDate() : $query->getRequestedDate();
@@ -59,6 +59,6 @@ class CacheStore implements ExchangeRateStore
 
     private function getCacheTTL(): ?int
     {
-        return $this->options['cache_ttl'] ?? null;
+        return $this->options['ttl'] ?? null;
     }
 }

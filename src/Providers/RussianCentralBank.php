@@ -43,11 +43,6 @@ class RussianCentralBank extends HttpService
         return $this->createRate($currencyPair, $rate / $unit, $responseDate, $query->getDate());
     }
 
-    public function getName(): string
-    {
-        return 'russian_central_bank';
-    }
-
     /**
      * Builds the url.
      *
