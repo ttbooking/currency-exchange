@@ -8,36 +8,34 @@ use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 
 abstract class HttpService extends ExchangeRateService
 {
     public function __construct(
-        private ?ClientInterface $httpClient = null,
-        private ?RequestFactoryInterface $requestFactory = null,
+        protected ?ClientInterface $httpClient = null,
+        protected ?RequestFactoryInterface $requestFactory = null,
     ) {
         $this->httpClient ??= HttpClientDiscovery::find();
         $this->requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
     }
 
-    private function buildRequest(string $url, array $headers = []): RequestInterface
-    {
-        $request = $this->requestFactory->createRequest('GET', $url);
+    protected function request(
+        string $url,
+        array $headers = [],
+        string $method = 'GET',
+        string|array $body = '',
+    ): string {
+        $request = $this->requestFactory->createRequest($method, $url);
+
         foreach ($headers as $header => $value) {
             $request = $request->withHeader($header, $value);
         }
 
-        return $request;
-    }
+        if ($body) {
+            $stream = $this->streamFactory->createStream(is_array($body) ? http_build_query($body) : $body);
+            $request = $request->withBody($stream);
+        }
 
-    protected function request(string $url, array $headers = []): string
-    {
-        return (string) $this->getResponse($url, $headers)->getBody();
-    }
-
-    protected function getResponse(string $url, array $headers = []): ResponseInterface
-    {
-        return $this->httpClient->sendRequest($this->buildRequest($url, $headers));
+        return (string) $this->httpClient->sendRequest($request)->getBody();
     }
 }

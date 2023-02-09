@@ -12,7 +12,7 @@ use TTBooking\CurrencyExchange\ExchangeRateQuery;
 
 class Cross implements ExchangeRateProvider
 {
-    public function __construct(protected ExchangeRateProvider $provider, protected string $throughCurrency)
+    public function __construct(protected ExchangeRateProvider $provider, protected string $crossCurrency)
     {
     }
 
@@ -56,8 +56,8 @@ class Cross implements ExchangeRateProvider
         $baseCurrency = $query->getCurrencyPair()->getBaseCurrency();
         $quoteCurrency = $query->getCurrencyPair()->getQuoteCurrency();
 
-        $currencyPair1 = new CurrencyPair($baseCurrency, $this->throughCurrency);
-        $currencyPair2 = new CurrencyPair($quoteCurrency, $this->throughCurrency);
+        $currencyPair1 = new CurrencyPair($baseCurrency, $this->crossCurrency);
+        $currencyPair2 = new CurrencyPair($quoteCurrency, $this->crossCurrency);
 
         return [
             new ExchangeRateQuery($currencyPair1, $query->getDate()),

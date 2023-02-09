@@ -9,13 +9,13 @@ use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 use TTBooking\CurrencyExchange\ExchangeRate;
 use TTBooking\CurrencyExchange\StringUtil;
 
-class RussianCentralBank extends HttpService
+class NationalBankOfRepublicKazakhstan extends HttpService
 {
-    protected const URL = 'https://www.cbr.ru/scripts/XML_daily.asp';
+    protected const URL = 'https://nationalbank.kz/rss/get_rates.cfm';
 
     public function has(ExchangeRateQuery $query): bool
     {
-        return 'RUB' === $query->getCurrencyPair()->getQuoteCurrency();
+        return 'KZT' === $query->getCurrencyPair()->getQuoteCurrency();
     }
 
     public function get(ExchangeRateQuery $query): ExchangeRate
@@ -30,22 +30,18 @@ class RussianCentralBank extends HttpService
         $content = $this->request($this->buildUrl($query->getDate()));
         $element = StringUtil::xmlToElement($content);
 
-        $elements = $element->xpath('./Valute[CharCode="'.$baseCurrency.'"]');
-        $responseDate = \DateTimeImmutable::createFromFormat('!d.m.Y', (string) $element['Date']);
+        $elements = $element->xpath('./item[title="'.$baseCurrency.'"]');
+        $responseDate = \DateTimeImmutable::createFromFormat('!d.m.Y', (string) $element['date']);
 
-        if (empty($elements)) {
-            throw new UnsupportedExchangeQueryException;
-        }
-
-        $rate = str_replace(',', '.', (string) $elements['0']->Value);
-        $unit = str_replace(',', '.', (string) $elements['0']->Nominal);
+        $rate = $elements['0']->description;
+        $unit = $elements['0']->quant;
 
         return $this->createRate($currencyPair, $rate / $unit, $responseDate, $query->getDate());
     }
 
     public function getName(): string
     {
-        return 'russian_central_bank';
+        return 'national_bank_of_republic_kazakhstan';
     }
 
     /**
@@ -57,6 +53,6 @@ class RussianCentralBank extends HttpService
      */
     private function buildUrl(\DateTimeInterface $requestedDate): string
     {
-        return static::URL.'?'.http_build_query(['date_req' => $requestedDate->format('d.m.Y')]);
+        return static::URL.'?fdate='.$requestedDate->format('d.m.Y');
     }
 }

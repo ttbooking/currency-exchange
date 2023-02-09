@@ -13,9 +13,9 @@ use TTBooking\CurrencyExchange\StringUtil;
 class Proxy extends HttpService
 {
     public function __construct(
+        protected array $config = [],
         ?ClientInterface $httpClient = null,
         ?RequestFactoryInterface $requestFactory = null,
-        protected array $config = [],
     ) {
         parent::__construct($httpClient, $requestFactory);
     }

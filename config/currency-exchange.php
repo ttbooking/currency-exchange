@@ -15,9 +15,16 @@ return [
         'chain' => [
             'services' => [
                 'national_bank_of_republic_belarus',
+                'national_bank_of_republic_kazakhstan',
                 'central_bank_of_republic_uzbekistan',
                 'russian_central_bank',
             ],
+        ],
+
+        'bank_center_credit_kazakhstan' => [
+            'client_id' => env('CX_BCC_ID'),
+            'client_secret' => env('CX_BCC_SECRET'),
+            'sell' => env('CX_BCC_SELL', true),
         ],
 
         'cache' => [

@@ -18,11 +18,11 @@ class CentralBankOfRepublicUzbekistan extends HttpService
         return 'UZS' === $query->getCurrencyPair()->getQuoteCurrency();
     }
 
-    public function get(ExchangeRateQuery $query, \DateTimeInterface $requestedDate = null): ExchangeRate
+    public function get(ExchangeRateQuery $query): ExchangeRate
     {
         $currencyPair = $query->getCurrencyPair();
 
-        $content = $this->request($this->buildUrl($requestedDate));
+        $content = $this->request($this->buildUrl($query->getDate()));
         $element = StringUtil::jsonToArray($content);
 
         $currencyInfo = array_values(array_filter($element, function ($currency) use ($currencyPair) {
@@ -34,7 +34,7 @@ class CentralBankOfRepublicUzbekistan extends HttpService
 
             $date = new \DateTimeImmutable((string) $currencyInfo[0]['Date']);
 
-            return $this->createRate($currencyPair, ($rate / $unit), $date);
+            return $this->createRate($currencyPair, $rate / $unit, $date, $query->getDate());
         }
 
         throw new UnsupportedExchangeQueryException;
