@@ -13,7 +13,9 @@ abstract class ExchangeRateService implements ExchangeRateServiceContract
 {
     public static function getName(): string
     {
-        return static::SERVICE_NAME ?? Str::snake(class_basename(static::class));
+        return defined(static::class.'::SERVICE_NAME')
+            ? static::SERVICE_NAME
+            : Str::snake(class_basename(static::class));
     }
 
     /**

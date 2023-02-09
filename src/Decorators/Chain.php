@@ -12,13 +12,17 @@ use TTBooking\CurrencyExchange\ExchangeRate;
 
 class Chain implements ExchangeRateProvider
 {
+    /** @var list<ExchangeRateProvider> $providers */
+    protected array $providers;
+
     /**
      * Creates a new chain provider.
      *
      * @param iterable<ExchangeRateProvider> $providers
      */
-    public function __construct(protected iterable $providers = [])
+    public function __construct(iterable $providers = [])
     {
+        $this->providers = is_array($providers) ? $providers : iterator_to_array($providers, false);
     }
 
     public function get(ExchangeRateQuery $query): ExchangeRate
