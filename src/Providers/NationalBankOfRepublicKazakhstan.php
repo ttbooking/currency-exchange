@@ -31,10 +31,10 @@ class NationalBankOfRepublicKazakhstan extends HttpService
         $element = StringUtil::xmlToElement($content);
 
         $elements = $element->xpath('./item[title="'.$baseCurrency.'"]');
-        $responseDate = \DateTimeImmutable::createFromFormat('!d.m.Y', (string) $element['date']);
+        $responseDate = \DateTimeImmutable::createFromFormat('!d.m.Y', (string) $element->date);
 
-        $rate = $elements['0']->description;
-        $unit = $elements['0']->quant;
+        $rate = (string) $elements['0']->description;
+        $unit = (string) $elements['0']->quant;
 
         return $this->createRate($currencyPair, $rate / $unit, $responseDate, $query->getDate());
     }
