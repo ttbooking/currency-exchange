@@ -40,18 +40,26 @@ class BankCenterCreditKazakhstan extends HttpService
 
     public function get(ExchangeRateQuery $query): ExchangeRate
     {
-        $currencyPair = $query->getCurrencyPair();
-
-        if (!$this->has($query)) {
+        if (! $this->has($query)) {
             throw new UnsupportedExchangeQueryException;
         }
 
-        $content = $this->request(static::URL.'/v1/public/rates', [
-            'Authorization' => 'Bearer '.$this->getToken(),
-            'Accept' => 'application/json',
-        ]);
-        $result = StringUtil::jsonToArray($content)['Rates'];
-        $entryId = array_search($currencyPair->getBaseCurrency(), array_column($result, 'currency'));
+        $rates = retry(2, function ($attempt) {
+            $content = $this->request(static::URL.'/v1/public/rates', [
+                'Authorization' => 'Bearer '.$this->getToken((bool) ($attempt - 1)),
+                'Accept' => 'application/json',
+            ]);
+
+            $result = StringUtil::jsonToArray($content);
+            if (! isset($result['Rates'])) {
+                throw new \RuntimeException('Service has returned malformed response');
+            }
+
+            return $result['Rates'];
+        });
+
+        $currencyPair = $query->getCurrencyPair();
+        $entryId = array_search($currencyPair->getBaseCurrency(), array_column($rates, 'currency'));
 
         if ($entryId === false) {
             throw new UnsupportedExchangeQueryException;
@@ -67,24 +75,27 @@ class BankCenterCreditKazakhstan extends HttpService
          *     dateTime: string
          * } $entry
          */
-        $entry = $result[$entryId];
+        $entry = $rates[$entryId];
         $operation = ($this->config['sell'] ?? true) ? 'sell' : 'purchase';
 
-        if (!isset($entry[$operation])) {
+        if (! isset($entry[$operation])) {
             throw new \RuntimeException('Service has returned malformed response');
         }
 
         $date = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $entry['dateTime'] ?? null);
-        if (!$date) {
+        if (! $date) {
             throw new UnsupportedExchangeQueryException;
         }
 
         return $this->createRate($currencyPair, $entry[$operation], $date, $query->getDate());
     }
 
-    private function getToken(): string
+    private function getToken(bool $fresh = false): string
     {
-        return $this->remember($this->getCacheKey(), function () {
+        $cacheKey = $this->getCacheKey();
+        $fresh && $this->cache->delete($cacheKey);
+
+        return $this->remember($cacheKey, function () {
             $clientId = $this->config['client_id'] ?? '';
             $clientSecret = $this->config['client_secret'] ?? '';
 
