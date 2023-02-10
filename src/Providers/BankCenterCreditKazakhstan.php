@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange\Providers;
 
+use Closure;
+use DateInterval;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\SimpleCache\CacheInterface;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 use TTBooking\CurrencyExchange\ExchangeRate;
@@ -22,6 +25,7 @@ class BankCenterCreditKazakhstan extends HttpService
         ClientInterface $httpClient = null,
         RequestFactoryInterface $requestFactory = null,
         protected ?StreamFactoryInterface $streamFactory = null,
+        protected ?CacheInterface $cache = null,
     ) {
         parent::__construct($httpClient, $requestFactory);
         $this->streamFactory ??= Psr17FactoryDiscovery::findStreamFactory();
@@ -80,23 +84,63 @@ class BankCenterCreditKazakhstan extends HttpService
 
     private function getToken(): string
     {
+        return $this->remember($this->getCacheKey(), 3600, function () {
+            $clientId = $this->config['client_id'] ?? '';
+            $clientSecret = $this->config['client_secret'] ?? '';
+
+            $content = $this->request(
+                static::URL.'/v1/auth/token',
+                [
+                    'Authorization' => 'Basic '.base64_encode("$clientId:$clientSecret"),
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Accept' => 'application/json',
+                ],
+                'POST',
+                [
+                    'grant_type' => 'client_credentials',
+                    'scope' => 'bcc.application.public',
+                ]
+            );
+
+            return StringUtil::jsonToArray($content)['access_token'];
+        });
+    }
+
+    private function getCacheKey(): string
+    {
         $clientId = $this->config['client_id'] ?? '';
-        $clientSecret = $this->config['client_secret'] ?? '';
+        $cacheKeyPrefix = $this->config['token_cache_key_prefix'] ?? '';
+        $cacheKeyPrefix = preg_replace('#[{}()/\\\@]#', '-', $cacheKeyPrefix);
 
-        $content = $this->request(
-            static::URL.'/v1/auth/token',
-            [
-                'Authorization' => 'Basic '.base64_encode("$clientId:$clientSecret"),
-                'Content-Type' => 'application/x-www-form-urlencoded',
-                'Accept' => 'application/json',
-            ],
-            'POST',
-            [
-                'grant_type'=> 'client_credentials',
-                'scope' => 'bcc.application.public',
-            ]
-        );
+        return $cacheKeyPrefix.$clientId;
+    }
 
-        return StringUtil::jsonToArray($content)['access_token'];
+    /**
+     * Get an item from the cache, or execute the given Closure and store the result.
+     *
+     * @template TCacheValue
+     *
+     * @param  string  $key
+     * @param  DateInterval|int|null  $ttl
+     * @param  Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    private function remember(string $key, DateInterval|int|null $ttl, Closure $callback): mixed
+    {
+        if (! $this->cache) {
+            return $callback();
+        }
+
+        if (method_exists($this->cache, 'remember')) {
+            return $this->cache->remember($key, $ttl, $callback);
+        }
+
+        if (! is_null($value = $this->cache->get($key))) {
+            return $value;
+        }
+
+        $this->cache->set($key, $value = $callback(), $ttl);
+
+        return $value;
     }
 }

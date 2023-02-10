@@ -32,6 +32,7 @@ return [
             'client_id' => env('CX_BCC_ID'),
             'client_secret' => env('CX_BCC_SECRET'),
             'sell' => env('CX_BCC_SELL', true),
+            'token_cache_key_prefix' => env('CX_BCC_TOKEN_CACHE_PREFIX', 'bcc_token:'),
         ],
 
     ],
