@@ -29,6 +29,7 @@ return [
         ],
 
         'bank_center_credit_kazakhstan' => [
+            'url' => env('CX_BCC_URL', 'https://api.bcc.kz/bcc/production'),
             'client_id' => env('CX_BCC_ID'),
             'client_secret' => env('CX_BCC_SECRET'),
             'sell' => env('CX_BCC_SELL', true),

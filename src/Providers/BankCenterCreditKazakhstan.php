@@ -45,7 +45,7 @@ class BankCenterCreditKazakhstan extends HttpService
         }
 
         $rates = retry(2, function ($attempt) {
-            $content = $this->request(static::URL.'/v1/public/rates', [
+            $content = $this->request($this->buildUrl('v1/public/rates'), [
                 'Authorization' => 'Bearer '.$this->getToken((bool) ($attempt - 1)),
                 'Accept' => 'application/json',
             ]);
@@ -100,7 +100,7 @@ class BankCenterCreditKazakhstan extends HttpService
             $clientSecret = $this->config['client_secret'] ?? '';
 
             $content = $this->request(
-                static::URL.'/v1/auth/token',
+                $this->buildUrl('v1/auth/token'),
                 [
                     'Authorization' => 'Basic '.base64_encode("$clientId:$clientSecret"),
                     'Content-Type' => 'application/x-www-form-urlencoded',
@@ -119,13 +119,22 @@ class BankCenterCreditKazakhstan extends HttpService
         });
     }
 
+    private function buildUrl(string $endpoint = ''): string
+    {
+        return rtrim($this->config['url'] ?? static::URL, '/').($endpoint ? '/'.ltrim($endpoint, '/') : '');
+    }
+
     private function getCacheKey(): string
     {
-        $clientId = $this->config['client_id'] ?? '';
         $cacheKeyPrefix = $this->config['token_cache_key_prefix'] ?? '';
         $cacheKeyPrefix = preg_replace('#[{}()/\\\@]#', '-', $cacheKeyPrefix);
 
-        return $cacheKeyPrefix.$clientId;
+        $cacheKey = $cacheKeyPrefix.sha1($this->buildUrl().($this->config['client_id'] ?? ''));
+        if (strlen($cacheKey) > 64) {
+            throw new \Exception("Cache key length exceeds 64 characters ('$cacheKey'). This violates PSR-6 standard");
+        }
+
+        return $cacheKey;
     }
 
     /**
