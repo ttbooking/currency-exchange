@@ -84,7 +84,7 @@ class BankCenterCreditKazakhstan extends HttpService
 
     private function getToken(): string
     {
-        return $this->remember($this->getCacheKey(), 3600, function () {
+        return $this->remember($this->getCacheKey(), function () {
             $clientId = $this->config['client_id'] ?? '';
             $clientSecret = $this->config['client_secret'] ?? '';
 
@@ -102,7 +102,9 @@ class BankCenterCreditKazakhstan extends HttpService
                 ]
             );
 
-            return StringUtil::jsonToArray($content)['access_token'];
+            $result = StringUtil::jsonToArray($content);
+
+            return [$result['access_token'], $result['expires_in'] ?? 3600];
         });
     }
 
@@ -121,25 +123,21 @@ class BankCenterCreditKazakhstan extends HttpService
      * @template TCacheValue
      *
      * @param  string  $key
-     * @param  DateInterval|int|null  $ttl
-     * @param  Closure(): TCacheValue  $callback
+     * @param  Closure(): array{0: TCacheValue, 1?: DateInterval|int|null|false}  $callback
      * @return TCacheValue
      */
-    private function remember(string $key, DateInterval|int|null $ttl, Closure $callback): mixed
+    private function remember(string $key, Closure $callback): mixed
     {
         if (! $this->cache) {
-            return $callback();
-        }
-
-        if (method_exists($this->cache, 'remember')) {
-            return $this->cache->remember($key, $ttl, $callback);
+            return $callback()[0];
         }
 
         if (! is_null($value = $this->cache->get($key))) {
             return $value;
         }
 
-        $this->cache->set($key, $value = $callback(), $ttl);
+        [$value, $ttl] = $callback() + [1 => false];
+        $ttl !== false && $this->cache->set($key, $value, $ttl);
 
         return $value;
     }
