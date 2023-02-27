@@ -6,6 +6,7 @@ namespace TTBooking\CurrencyExchange\Providers;
 
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 use TTBooking\CurrencyExchange\ExchangeRate;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\StringUtil;
@@ -24,12 +25,7 @@ class Proxy extends HttpService
 
     public function has(ExchangeRateQuery $query): bool
     {
-        try {
-            $this->get($query);
-            return true;
-        } catch (\Throwable) {
-            return false;
-        }
+        return true;
     }
 
     public function get(ExchangeRateQuery $query): ExchangeRate
@@ -37,7 +33,11 @@ class Proxy extends HttpService
         $content = $this->request($this->buildUrl($query), ['Accept' => 'application/json']);
         $result = StringUtil::jsonToArray($content);
 
-        return ExchangeRate::fromArray($result);
+        try {
+            return ExchangeRate::fromArray($result);
+        } catch (\Throwable) {
+            throw new UnsupportedExchangeQueryException;
+        }
     }
 
     private function buildUrl(ExchangeRateQuery $query): string
