@@ -11,7 +11,7 @@ use TTBooking\CurrencyExchange\StringUtil;
 
 class NationalBankOfRepublicBelarus extends HttpService
 {
-    protected const URL = 'https://www.nbrb.by/api/exrates/rates';
+    protected const URL = 'https://api.nbrb.by/exrates/rates';
 
     public function has(ExchangeRateQuery $query, bool $ignoreSupportPeriod = false): bool
     {
@@ -82,7 +82,7 @@ class NationalBankOfRepublicBelarus extends HttpService
     /**
      * Array of base currency codes supported by the service.
      *
-     * @url https://www.nbrb.by/api/exrates/currencies
+     * @url https://api.nbrb.by/exrates/currencies
      *
      * @return list<array{
      *     Cur_Abbreviation: string,
