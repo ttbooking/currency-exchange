@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange\Providers;
 
-use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
+use Http\Discovery\Psr18ClientDiscovery;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 
@@ -15,7 +15,7 @@ abstract class HttpService extends ExchangeRateService
         protected ?ClientInterface $httpClient = null,
         protected ?RequestFactoryInterface $requestFactory = null,
     ) {
-        $this->httpClient ??= HttpClientDiscovery::find();
+        $this->httpClient ??= Psr18ClientDiscovery::find();
         $this->requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
     }
 
