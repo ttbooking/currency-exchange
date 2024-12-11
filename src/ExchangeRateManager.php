@@ -50,7 +50,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
                     $this->config->get('currency-exchange.providers.chain.services', [])
                 )),
                 $this->config->get('currency-exchange.providers.chain.cross_currency', 'RUB')
-            )))
+            ), $this->config->get('currency-exchange.round_precision', 8)))
         );
     }
 
@@ -191,7 +191,7 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
                         $this->config->get('currency-exchange.stores.cache', [])
                     ))
                     : null
-            )), $crossCurrency)))
+            )), $crossCurrency), $this->config->get('currency-exchange.round_precision', 8)))
         );
     }
 
