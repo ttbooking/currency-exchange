@@ -51,6 +51,6 @@ return [
 
     ],
 
-    'round_precision' => env('CX_ROUND_PRECISION', 8),
+    'round_precision' => (int) env('CX_ROUND_PRECISION', 8),
 
 ];
