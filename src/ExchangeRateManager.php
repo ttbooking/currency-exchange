@@ -32,8 +32,6 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
 {
     /**
      * Create an instance of the Chain exchange rate provider.
-     *
-     * @return ExchangeRateProvider
      */
     public function createChainDriver(): ExchangeRateProvider
     {
@@ -58,8 +56,6 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
 
     /**
      * Create an instance of the Currency Exchange Gateway Proxy service.
-     *
-     * @return ExchangeRateProvider
      */
     public function createCurrencyExchangeGatewayDriver(): ExchangeRateProvider
     {
@@ -74,8 +70,6 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
 
     /**
      * Create an instance of the Central Bank of Russia service.
-     *
-     * @return ExchangeRateProvider
      */
     public function createRussianCentralBankDriver(): ExchangeRateProvider
     {
@@ -86,8 +80,6 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
 
     /**
      * Create an instance of the National Bank of the Republic of Belarus service.
-     *
-     * @return ExchangeRateProvider
      */
     public function createNationalBankOfRepublicBelarusDriver(): ExchangeRateProvider
     {
@@ -98,8 +90,6 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
 
     /**
      * Create an instance of the National Bank of the Republic of Kazakhstan service.
-     *
-     * @return ExchangeRateProvider
      */
     public function createNationalBankOfRepublicKazakhstanDriver(): ExchangeRateProvider
     {
@@ -110,8 +100,6 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
 
     /**
      * Create an instance of the Bank Center Credit Kazakhstan service.
-     *
-     * @return ExchangeRateProvider
      */
     public function createBankCenterCreditKazakhstanDriver(): ExchangeRateProvider
     {
@@ -122,8 +110,6 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
 
     /**
      * Create an instance of the Central Bank of the Republic of Uzbekistan service.
-     *
-     * @return ExchangeRateProvider
      */
     public function createCentralBankOfRepublicUzbekistanDriver(): ExchangeRateProvider
     {
@@ -132,23 +118,12 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
         return $this->decorateService(CentralBankOfRepublicUzbekistan::class, 'UZS');
     }
 
-    /**
-     * @param  ExchangeRateQueryContract|string  $query
-     * @param  mixed  $date
-     * @param  array  $options
-     * @return bool
-     */
     public function has(ExchangeRateQueryContract|string $query, mixed $date = null, array $options = []): bool
     {
         return $this->provider()->has($query, $date, $options);
     }
 
     /**
-     * @param  ExchangeRateQueryContract|string  $query
-     * @param  mixed  $date
-     * @param  array  $options
-     * @return ExchangeRate
-     *
      * @throws UnsupportedExchangeQueryException
      */
     public function get(ExchangeRateQueryContract|string $query, mixed $date = null, array $options = []): ExchangeRate
@@ -158,8 +133,6 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
 
     /**
      * Get the default driver name.
-     *
-     * @return string
      */
     public function getDefaultDriver(): string
     {
@@ -169,26 +142,20 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
     /**
      * Get a provider instance.
      *
-     * @param  string|null  $provider
-     * @return ExchangeRateProvider
      *
      * @throws InvalidArgumentException
      */
-    public function provider(string $provider = null): ExchangeRateProvider
+    public function provider(?string $provider = null): ExchangeRateProvider
     {
         return $this->driver($provider);
     }
 
     /**
      * Create an instance of the specific service.
-     *
-     * @param  ExchangeRateService|string  $service
-     * @param  array|null  $config
-     * @return ExchangeRateProviderContract
      */
     protected function createService(
         ExchangeRateService|string $service,
-        array $config = null
+        ?array $config = null
     ): ExchangeRateProviderContract {
         if (! is_string($service)) {
             return $service;
@@ -208,17 +175,11 @@ class ExchangeRateManager extends Manager implements ExchangeRateProviderContrac
 
     /**
      * Create a decorated instance of the specific service.
-     *
-     * @param  ExchangeRateService|string  $service
-     * @param  string  $crossCurrency
-     * @param  array|null  $config
-     * @param  bool  $cache
-     * @return ExchangeRateProvider
      */
     protected function decorateService(
         ExchangeRateService|string $service,
         string $crossCurrency,
-        array $config = null,
+        ?array $config = null,
         bool $cache = false
     ): ExchangeRateProvider {
         return new ExchangeRateProvider(

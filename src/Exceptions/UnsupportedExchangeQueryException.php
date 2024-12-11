@@ -6,6 +6,4 @@ namespace TTBooking\CurrencyExchange\Exceptions;
 
 use Exception;
 
-class UnsupportedExchangeQueryException extends Exception
-{
-}
+class UnsupportedExchangeQueryException extends Exception {}

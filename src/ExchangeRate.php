@@ -15,8 +15,7 @@ final class ExchangeRate implements ExchangeRateContract
         private \DateTimeInterface $factualDate,
         private \DateTimeInterface $requestedDate,
         private ?string $serviceName = null,
-    ) {
-    }
+    ) {}
 
     public function getCurrencyPair(): CurrencyPairContract
     {
@@ -45,7 +44,7 @@ final class ExchangeRate implements ExchangeRateContract
 
     public function isAuthoritative(): bool
     {
-        return !($this->requestedDate > $this->factualDate && $this->requestedDate > new \DateTimeImmutable);
+        return ! ($this->requestedDate > $this->factualDate && $this->requestedDate > new \DateTimeImmutable);
     }
 
     public function swapCurrencyPair(): self

@@ -18,7 +18,7 @@ class ChainException extends Exception
     /**
      * Creates a new chain exception.
      *
-     * @param Exception[] $exceptions
+     * @param  Exception[]  $exceptions
      */
     public function __construct(array $exceptions)
     {

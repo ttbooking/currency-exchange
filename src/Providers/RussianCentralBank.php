@@ -15,12 +15,12 @@ class RussianCentralBank extends HttpService
 
     public function has(ExchangeRateQuery $query): bool
     {
-        return 'RUB' === $query->getCurrencyPair()->getQuoteCurrency();
+        return $query->getCurrencyPair()->getQuoteCurrency() === 'RUB';
     }
 
     public function get(ExchangeRateQuery $query): ExchangeRate
     {
-        if (!$this->has($query)) {
+        if (! $this->has($query)) {
             throw new UnsupportedExchangeQueryException;
         }
 
@@ -45,10 +45,6 @@ class RussianCentralBank extends HttpService
 
     /**
      * Builds the url.
-     *
-     * @param \DateTimeInterface $requestedDate
-     *
-     * @return string
      */
     private function buildUrl(\DateTimeInterface $requestedDate): string
     {

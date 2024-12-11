@@ -12,9 +12,7 @@ use TTBooking\CurrencyExchange\ExchangeRateQuery;
 
 class Cross implements ExchangeRateProvider
 {
-    public function __construct(protected ExchangeRateProvider $provider, protected string $crossCurrency)
-    {
-    }
+    public function __construct(protected ExchangeRateProvider $provider, protected string $crossCurrency) {}
 
     public function get(ExchangeRateQueryContract $query): ExchangeRate
     {
@@ -48,7 +46,6 @@ class Cross implements ExchangeRateProvider
     }
 
     /**
-     * @param ExchangeRateQueryContract $query
      * @return ExchangeRateQuery[]
      */
     protected function fork(ExchangeRateQueryContract $query): array

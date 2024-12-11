@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange\Stores;
 
-use PDO, PDOException;
+use PDO;
+use PDOException;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRate as ExchangeRateContract;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery;
 use TTBooking\CurrencyExchange\Contracts\ExchangeRateStore;
@@ -20,9 +21,7 @@ from %s where base = ? and quote = ? and ? between factual_date and requested_da
 order by factual_date desc, updated_at limit 1
 SQL;
 
-    public function __construct(protected PDO $pdo, protected string $table)
-    {
-    }
+    public function __construct(protected PDO $pdo, protected string $table) {}
 
     public function has(ExchangeRateQuery $query): bool
     {

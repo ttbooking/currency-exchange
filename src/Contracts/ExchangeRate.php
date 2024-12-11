@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange\Contracts;
 
-interface ExchangeRate extends \Stringable, \JsonSerializable
+interface ExchangeRate extends \JsonSerializable, \Stringable
 {
     public function getValue(): float;
 

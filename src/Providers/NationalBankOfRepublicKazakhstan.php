@@ -15,12 +15,12 @@ class NationalBankOfRepublicKazakhstan extends HttpService
 
     public function has(ExchangeRateQuery $query): bool
     {
-        return 'KZT' === $query->getCurrencyPair()->getQuoteCurrency();
+        return $query->getCurrencyPair()->getQuoteCurrency() === 'KZT';
     }
 
     public function get(ExchangeRateQuery $query): ExchangeRate
     {
-        if (!$this->has($query)) {
+        if (! $this->has($query)) {
             throw new UnsupportedExchangeQueryException;
         }
 
@@ -41,10 +41,6 @@ class NationalBankOfRepublicKazakhstan extends HttpService
 
     /**
      * Builds the url.
-     *
-     * @param \DateTimeInterface $requestedDate
-     *
-     * @return string
      */
     private function buildUrl(\DateTimeInterface $requestedDate): string
     {

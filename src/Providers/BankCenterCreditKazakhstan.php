@@ -22,8 +22,8 @@ class BankCenterCreditKazakhstan extends HttpService
 
     public function __construct(
         protected array $config = [],
-        ClientInterface $httpClient = null,
-        RequestFactoryInterface $requestFactory = null,
+        ?ClientInterface $httpClient = null,
+        ?RequestFactoryInterface $requestFactory = null,
         protected ?StreamFactoryInterface $streamFactory = null,
         protected ?CacheInterface $cache = null,
     ) {
@@ -33,7 +33,7 @@ class BankCenterCreditKazakhstan extends HttpService
 
     public function has(ExchangeRateQuery $query): bool
     {
-        return 'KZT' === $query->getCurrencyPair()->getQuoteCurrency()
+        return $query->getCurrencyPair()->getQuoteCurrency() === 'KZT'
             && in_array($query->getCurrencyPair()->getBaseCurrency(), ['RUB', 'KGS', 'USD', 'EUR', 'GBP'])
             && $query->getDate()->format('Y-m-d') === (new \DateTimeImmutable)->format('Y-m-d');
     }
@@ -142,7 +142,6 @@ class BankCenterCreditKazakhstan extends HttpService
      *
      * @template TCacheValue
      *
-     * @param  string  $key
      * @param  Closure(): array{0: TCacheValue, 1?: DateInterval|int|null|false}  $callback
      * @return TCacheValue
      */

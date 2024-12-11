@@ -23,6 +23,7 @@
     },
     "require-dev": {
         "laravel/framework": "^9.0 || ^10.0 || ^11.0",
+        "laravel/pint": "^1.17",
         "nyholm/psr7": "^1.0",
         "php-http/message": "^1.7",
         "php-http/mock-client": "^1.0",

@@ -15,8 +15,7 @@ class CacheStore implements ExchangeRateStore
     public function __construct(
         protected CacheInterface $cache,
         protected array $options = [],
-    ) {
-    }
+    ) {}
 
     public function has(ExchangeRateQuery $query): bool
     {

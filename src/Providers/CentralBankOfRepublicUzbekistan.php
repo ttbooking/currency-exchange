@@ -15,7 +15,7 @@ class CentralBankOfRepublicUzbekistan extends HttpService
 
     public function has(ExchangeRateQuery $query): bool
     {
-        return 'UZS' === $query->getCurrencyPair()->getQuoteCurrency();
+        return $query->getCurrencyPair()->getQuoteCurrency() === 'UZS';
     }
 
     public function get(ExchangeRateQuery $query): ExchangeRate
@@ -28,7 +28,7 @@ class CentralBankOfRepublicUzbekistan extends HttpService
         $currencyInfo = array_values(array_filter($element, function ($currency) use ($currencyPair) {
             return $currency['Ccy'] === $currencyPair->getBaseCurrency();
         }));
-        if (!empty($currencyInfo)) {
+        if (! empty($currencyInfo)) {
             $rate = (float) $currencyInfo[0]['Rate'];
             $unit = (int) $currencyInfo[0]['Nominal'];
 
@@ -42,12 +42,8 @@ class CentralBankOfRepublicUzbekistan extends HttpService
 
     /**
      * Builds the url.
-     *
-     * @param \DateTimeInterface|null $requestedDate
-     *
-     * @return string
      */
-    private function buildUrl(\DateTimeInterface $requestedDate = null): string
+    private function buildUrl(?\DateTimeInterface $requestedDate = null): string
     {
         $date = is_null($requestedDate) ? '' : '?date='.$requestedDate->format('d.m.Y');
 

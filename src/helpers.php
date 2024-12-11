@@ -9,11 +9,6 @@ use TTBooking\CurrencyExchange\Facades\ExchangeRate;
 
 if (! function_exists('xrate')) {
     /**
-     * @param  ExchangeRateQuery|string  $query
-     * @param  mixed  $date
-     * @param  array  $options
-     * @return ExchangeRateResult
-     *
      * @throws UnsupportedExchangeQueryException
      */
     function xrate(ExchangeRateQuery|string $query, mixed $date = null, array $options = []): ExchangeRateResult
@@ -28,9 +23,7 @@ if (! function_exists('retry')) {
      *
      * @template TReturn
      *
-     * @param  int|array  $times
      * @param  callable(int=): TReturn  $callback
-     * @param  int|Closure  $sleepMilliseconds
      * @param  (callable(Exception): bool)|null  $when
      * @return TReturn
      *
@@ -40,7 +33,7 @@ if (! function_exists('retry')) {
         int|array $times,
         callable $callback,
         int|Closure $sleepMilliseconds = 0,
-        callable $when = null
+        ?callable $when = null
     ): mixed {
         $attempts = 0;
 

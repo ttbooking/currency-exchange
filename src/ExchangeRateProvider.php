@@ -10,9 +10,7 @@ use TTBooking\CurrencyExchange\Contracts\ExchangeRateQuery as ExchangeRateQueryC
 
 final class ExchangeRateProvider implements ExchangeRateProviderContract
 {
-    public function __construct(private ExchangeRateProviderContract $provider)
-    {
-    }
+    public function __construct(private ExchangeRateProviderContract $provider) {}
 
     public function has(ExchangeRateQueryContract|string $query, mixed $date = null, array $options = []): bool
     {

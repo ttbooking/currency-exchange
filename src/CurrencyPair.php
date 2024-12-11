@@ -11,8 +11,7 @@ final class CurrencyPair implements CurrencyPairContract
     public function __construct(
         private string $baseCurrency,
         private string $quoteCurrency,
-    ) {
-    }
+    ) {}
 
     public function getBaseCurrency(): string
     {
@@ -49,7 +48,7 @@ final class CurrencyPair implements CurrencyPairContract
 
     public static function fromString(string $currencyPair): self
     {
-        if (!preg_match('#^[A-Z]{3}/[A-Z]{3}$#', $currencyPair)) {
+        if (! preg_match('#^[A-Z]{3}/[A-Z]{3}$#', $currencyPair)) {
             throw new \InvalidArgumentException('The currency pair must be in the form "EUR/USD".');
         }
 

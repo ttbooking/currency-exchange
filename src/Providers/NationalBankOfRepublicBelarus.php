@@ -18,7 +18,7 @@ class NationalBankOfRepublicBelarus extends HttpService
         $currencyPair = $query->getCurrencyPair();
         $baseCurrency = $currencyPair->getBaseCurrency();
         $quoteCurrency = $currencyPair->getQuoteCurrency();
-        $date = !$ignoreSupportPeriod ? $query->getDate() : null;
+        $date = ! $ignoreSupportPeriod ? $query->getDate() : null;
 
         return is_int(self::detectPeriodicity($baseCurrency, $date))
             && self::supportQuoteCurrency($quoteCurrency, $date);
@@ -27,12 +27,9 @@ class NationalBankOfRepublicBelarus extends HttpService
     /**
      * Tells if the service supports base currency for the given date and detect its periodicity if it does.
      *
-     * @param string $baseCurrency
-     * @param \DateTimeInterface|NullProvider $date
-     *
-     * @return int|false
+     * @param  \DateTimeInterface|NullProvider  $date
      */
-    private static function detectPeriodicity(string $baseCurrency, \DateTimeInterface $date = null): int|false
+    private static function detectPeriodicity(string $baseCurrency, ?\DateTimeInterface $date = null): int|false
     {
         return array_reduce(
 
@@ -61,12 +58,9 @@ class NationalBankOfRepublicBelarus extends HttpService
     /**
      * Tells if the service supports quote currency for the given date.
      *
-     * @param string $quoteCurrency
-     * @param \DateTimeInterface|NullProvider $date
-     *
-     * @return bool
+     * @param  \DateTimeInterface|NullProvider  $date
      */
-    private static function supportQuoteCurrency(string $quoteCurrency, \DateTimeInterface $date = null): bool
+    private static function supportQuoteCurrency(string $quoteCurrency, ?\DateTimeInterface $date = null): bool
     {
         if ($date) {
             $date = $date->format('Y-m-d');
@@ -101,8 +95,6 @@ class NationalBankOfRepublicBelarus extends HttpService
     /**
      * Creates the rate.
      *
-     * @param ExchangeRateQuery $query
-     * @return ExchangeRate
      *
      * @throws UnsupportedExchangeQueryException
      */
@@ -111,7 +103,7 @@ class NationalBankOfRepublicBelarus extends HttpService
         $currencyPair = $query->getCurrencyPair();
         $baseCurrency = $currencyPair->getBaseCurrency();
 
-        if (!$this->has($query, true)) {
+        if (! $this->has($query, true)) {
             throw new UnsupportedExchangeQueryException;
         }
 
@@ -139,12 +131,12 @@ class NationalBankOfRepublicBelarus extends HttpService
          */
         $entry = $result[$entryId];
 
-        if (!isset($entry['Cur_OfficialRate'])) {
+        if (! isset($entry['Cur_OfficialRate'])) {
             throw new \RuntimeException('Service has returned malformed response');
         }
 
         $date = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $entry['Date'] ?? null);
-        if (!$date) {
+        if (! $date) {
             throw new UnsupportedExchangeQueryException;
         }
 
@@ -156,11 +148,6 @@ class NationalBankOfRepublicBelarus extends HttpService
 
     /**
      * Builds the url.
-     *
-     * @param string $baseCurrency
-     * @param \DateTimeInterface $requestedDate
-     *
-     * @return string
      */
     private function buildUrl(string $baseCurrency, \DateTimeInterface $requestedDate): string
     {

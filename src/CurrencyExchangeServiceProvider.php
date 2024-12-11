@@ -12,8 +12,6 @@ class CurrencyExchangeServiceProvider extends ServiceProvider implements Deferra
 {
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -35,8 +33,6 @@ class CurrencyExchangeServiceProvider extends ServiceProvider implements Deferra
 
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -55,8 +51,6 @@ class CurrencyExchangeServiceProvider extends ServiceProvider implements Deferra
 
     /**
      * Get the services provided by the provider.
-     *
-     * @return array
      */
     public function provides(): array
     {

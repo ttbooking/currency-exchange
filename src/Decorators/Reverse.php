@@ -11,9 +11,7 @@ use TTBooking\CurrencyExchange\Exceptions\UnsupportedExchangeQueryException;
 
 class Reverse implements ExchangeRateProvider
 {
-    public function __construct(protected ExchangeRateProvider $provider)
-    {
-    }
+    public function __construct(protected ExchangeRateProvider $provider) {}
 
     public function get(ExchangeRateQuery $query): ExchangeRate
     {

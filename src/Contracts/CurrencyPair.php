@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TTBooking\CurrencyExchange\Contracts;
 
-interface CurrencyPair extends \Stringable, \JsonSerializable
+interface CurrencyPair extends \JsonSerializable, \Stringable
 {
     public function getBaseCurrency(): string;
 

@@ -46,7 +46,7 @@ final class StringUtil
 
         $data = json_decode($string, true);
 
-        if (JSON_ERROR_NONE !== json_last_error()) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             $last = json_last_error();
 
             throw new \RuntimeException('Unable to parse JSON data: '.($jsonErrors[$last] ?? 'Unknown error'));
