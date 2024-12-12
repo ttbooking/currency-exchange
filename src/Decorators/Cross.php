@@ -16,7 +16,7 @@ class Cross implements ExchangeRateProvider
 
     public function get(ExchangeRateQueryContract $query): ExchangeRate
     {
-        if ($this->provider->has($query)) {
+        if ($this->crossCurrency === $query->getCurrencyPair()->getQuoteCurrency() || $this->provider->has($query)) {
             return $this->provider->get($query);
         }
 
@@ -36,6 +36,10 @@ class Cross implements ExchangeRateProvider
 
     public function has(ExchangeRateQueryContract $query): bool
     {
+        if ($this->crossCurrency === $query->getCurrencyPair()->getQuoteCurrency()) {
+            return false;
+        }
+
         if ($this->provider->has($query)) {
             return true;
         }
