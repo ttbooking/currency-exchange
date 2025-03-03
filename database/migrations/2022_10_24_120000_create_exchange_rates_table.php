@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('factual_date');
             $table->date('requested_date');
             $table->string('service');
-            $table->unsignedDecimal('rate', 14, 8);
+            $table->decimal('rate', 14, 8);
             $table->primary(['base', 'quote', 'factual_date', 'service']);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
